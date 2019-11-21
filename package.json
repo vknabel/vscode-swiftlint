@@ -1,8 +1,24 @@
 {
   "name": "vscode-swiftlint",
   "displayName": "SwiftLint",
-  "description": "SwiftLint for VS Code",
+  "description": "VS Code extension to enforce Swift style and conventions via SwiftLint",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vknabel/vscode-swiftlint"
+  },
   "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "Valentin Knabel",
+    "email": "dev@vknabel.com",
+    "url": "https://github.com/vknabel"
+  },
+  "publisher": "vknabel",
+  "icon": "assets/icon.png",
+  "galleryBanner": {
+    "color": "#FC823F",
+    "theme": "light"
+  },
   "engines": {
     "vscode": "^1.40.0"
   },

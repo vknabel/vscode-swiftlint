@@ -41,11 +41,11 @@ let package = Package(
 
 ## Configuration
 
-| Config                                 | Type       | Default                       | Description                                                |
-| -------------------------------------- | ---------- | ----------------------------- | ---------------------------------------------------------- |
-| `apple-swift-format.enable`            | `Bool`     | `true`                        | Whether apple/swift-format should actually do something.   |
-| `apple-swift-format.path`              | `String`   | `/usr/local/bin/swift-format` | The location of the globally installed apple/swift-format. |
-| `apple-swift-format.configSearchPaths` | `[String]` | `[".swift-format"]`           | Possible paths for apple/swift-format config.              |
+| Config                        | Type       | Default                    | Description                                       |
+| ----------------------------- | ---------- | -------------------------- | ------------------------------------------------- |
+| `swiftlint.enable`            | `Bool`     | `true`                     | Whether SwiftLint should actually do something.   |
+| `swiftlint.path`              | `String`   | `/usr/local/bin/swiftlint` | The location of the globally installed SwiftLint. |
+| `swiftlint.configSearchPaths` | `[String]` | `[".swiftlint.yml"]`       | Possible paths for SwiftLint config.              |
 
 ## Contributors
 
@@ -53,4 +53,4 @@ let package = Package(
 
 ## License
 
-vscode-apple-swift-format is available under the [MIT](./LICENSE) license.
+vscode-swiftlint is available under the [MIT](./LICENSE) license.
