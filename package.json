@@ -1,0 +1,77 @@
+{
+  "name": "vscode-swiftlint",
+  "displayName": "SwiftLint",
+  "description": "SwiftLint for VS Code",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.40.0"
+  },
+  "categories": [
+    "Linters",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "swift",
+    "swiftlint",
+    "linter",
+    "lint"
+  ],
+  "activationEvents": [
+    "onLanguage:swift",
+    "workspaceContains:**/*swift"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "SwiftLint configuration",
+      "type": "object",
+      "properties": {
+        "swiftlint.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether SwiftLint should actually start up on this project."
+        },
+        "swiftlint.onlyEnableOnSwiftPMProjects": {
+          "type": "boolean",
+          "default": false,
+          "description": "Only allows the extension to load up when SwiftLint is available via SwiftPM."
+        },
+        "swiftlint.path": {
+          "type": "string",
+          "default": "/usr/local/bin/swiftlint",
+          "description": "The location of your globally installed SwiftLint."
+        },
+        "swiftlint.configSearchPaths": {
+          "type": "array",
+          "default": [
+            ".swiftlint.yml"
+          ],
+          "description": "Possible paths for SwiftLint config.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.11.7",
+    "@types/vscode": "^1.40.0",
+    "glob": "^7.1.5",
+    "mocha": "^6.2.2",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4",
+    "vscode-test": "^1.2.2"
+  },
+  "dependencies": {}
+}
