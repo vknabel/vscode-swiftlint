@@ -73,22 +73,25 @@ function reportToPreciseDiagnosticForDocument(
   document: TextDocument
 ): (report: Report) => Diagnostic {
   return report => {
-    const line = document.lineAt(report.line);
+    try {
+      const line = document.lineAt(report.line - 1);
+      let range: Range;
+      if (report.character === null) {
+        range = line.range;
+      } else {
+        const wordBegin = line.range.start.translate({
+          characterDelta: report.character
+        });
+        range =
+          document.getWordRangeAtPosition(wordBegin) ||
+          new Range(wordBegin, wordBegin.translate({ characterDelta: 1 }));
+      }
 
-    let range: Range;
-    if (report.character === null) {
-      range = line.range;
-    } else {
-      const wordBegin = line.range.start.translate({
-        characterDelta: report.character
-      });
-      range =
-        document.getWordRangeAtPosition(wordBegin) ||
-        new Range(wordBegin, wordBegin.translate({ characterDelta: 1 }));
+      const severity = reportSeverityToDiagnosticSeverity(report.severity);
+      return new Diagnostic(range, report.reason, severity);
+    } catch (error) {
+      throw error;
     }
-
-    const severity = reportSeverityToDiagnosticSeverity(report.severity);
-    return new Diagnostic(range, report.reason, severity);
   };
 }
 
@@ -96,7 +99,7 @@ function reportToSimpleDiagnostic(): (
   report: Report
 ) => { file: string; diagnostic: Diagnostic } {
   return report => {
-    const startPosition = new Position(report.line, report.character || 0);
+    const startPosition = new Position(report.line - 1, report.character || 0);
     const endPosition = startPosition.translate({ characterDelta: 1 });
     const range = new Range(startPosition, endPosition);
     const severity = reportSeverityToDiagnosticSeverity(report.severity);
