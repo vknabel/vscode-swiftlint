@@ -134,6 +134,7 @@ function execSwiftlint(
       {
         encoding: "utf8",
         env: process.env,
+        maxBuffer: 1024 * 500,
         ...(options || {})
       },
       (error, stdout, stderr) => {

@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import Current from "./Current";
-import * as path from "path";
 import { SwiftLint } from "./SwiftLintProvider";
 
 const swiftLint = new SwiftLint();
