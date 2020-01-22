@@ -5,7 +5,9 @@ import {
   Range,
   Uri,
   WorkspaceFolder,
-  Position
+  Position,
+  workspace,
+  RelativePattern
 } from "vscode";
 import {
   ExecException,
@@ -13,6 +15,8 @@ import {
   ExecFileOptionsWithStringEncoding
 } from "child_process";
 import Current from "./Current";
+import { join } from "path";
+import { existsSync } from "fs";
 
 interface Report {
   character: number | null;
@@ -51,9 +55,15 @@ export async function diagnosticsForFolder(request: {
   folder: WorkspaceFolder;
   parameters?: string[];
 }) {
+  const configArgs = await detectConfigArguments(request.folder);
+  const pathArgs =
+    configArgs.length === 0
+      ? await detectDefaultPathArguments(request.folder)
+      : [];
+
   const lintingResults = await execSwiftlint(
     request.folder.uri,
-    ["--path", request.folder.uri.path, ...(request.parameters || [])],
+    [...configArgs, ...pathArgs, ...(request.parameters || [])],
     {
       encoding: "utf8",
       env: process.env
@@ -67,6 +77,33 @@ export async function diagnosticsForFolder(request: {
     diagnosticsByFile.set(file, [...previous, diagnostic]);
   }
   return diagnosticsByFile;
+}
+
+async function detectConfigArguments(
+  workspaceFolder: WorkspaceFolder | null
+): Promise<string[]> {
+  const rootPath =
+    (workspaceFolder && workspaceFolder.uri.fsPath) ||
+    workspace.rootPath ||
+    "./";
+  const searchPaths = Current.config
+    .lintConfigSearchPaths()
+    .map(current => join(rootPath, current));
+  const existingConfig = searchPaths.find(existsSync);
+  return existingConfig ? ["--config", existingConfig] : [];
+}
+
+async function detectDefaultPathArguments(
+  workspaceFolder: WorkspaceFolder
+): Promise<string[]> {
+  const fileUris = await workspace.findFiles(
+    new RelativePattern(workspaceFolder, "**/*.swift"),
+    new RelativePattern(
+      workspaceFolder,
+      "**/{tmp,build,.build,Pods,Carthage}/**"
+    )
+  );
+  return fileUris.map(uri => uri.path);
 }
 
 function reportToPreciseDiagnosticForDocument(
