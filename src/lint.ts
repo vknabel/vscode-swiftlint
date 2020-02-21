@@ -36,6 +36,10 @@ export async function diagnosticsForDocument(request: {
   if (input.trim() === "") {
     return [];
   }
+  const lintingPaths = request.parameters || [];
+  if (lintingPaths.length === 0) {
+    return [];
+  }
   const lintingResults = await execSwiftlint(
     request.document.uri,
     request.parameters || [],
@@ -44,11 +48,16 @@ export async function diagnosticsForDocument(request: {
       input
     }
   );
-  const reports: Report[] = JSON.parse(lintingResults) || [];
-  const diagnostics = reports.map(
-    reportToPreciseDiagnosticForDocument(request.document)
-  );
-  return diagnostics;
+  try {
+    const reports: Report[] = JSON.parse(lintingResults) || [];
+    const diagnostics = reports.map(
+      reportToPreciseDiagnosticForDocument(request.document)
+    );
+    return diagnostics;
+  } catch (error) {
+    console.log("[Parsing linting results]", error);
+    return [];
+  }
 }
 
 export async function diagnosticsForFolder(request: {
@@ -177,6 +186,13 @@ function execSwiftlint(
       (error, stdout, stderr) => {
         if (error && isExecException(error) && error.code === 2) {
           return resolve(stdout);
+        } else if (
+          error &&
+          "code" in error &&
+          error["code"] === "ERR_CHILD_PROCESS_STDIO_MAXBUFFER"
+        ) {
+          console.log("stderr", stderr);
+          return resolve("[]");
         } else if (error) {
           console.log("stderr", stderr);
           return reject(error);
