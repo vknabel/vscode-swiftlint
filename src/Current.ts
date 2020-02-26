@@ -90,6 +90,7 @@ export function prodEnvironment(): Current {
         vscode.workspace
           .getConfiguration()
           .get("swiftlint.configSearchPaths", [".swiftlint.yml"])
+          .map(absolutePath)
     }
   };
 }

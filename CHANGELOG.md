@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+- Fixed: `swiftlint.configSearchPaths` did not support `~` #8
+
 ## 1.0.4
 
 - Fixed: Unexpected end of JSON input #4 and #7

@@ -15,7 +15,7 @@ import {
   ExecFileOptionsWithStringEncoding
 } from "child_process";
 import Current from "./Current";
-import { join } from "path";
+import { resolve } from "path";
 import { existsSync } from "fs";
 
 interface Report {
@@ -65,10 +65,7 @@ export async function diagnosticsForFolder(request: {
   parameters?: string[];
 }) {
   const configArgs = await detectConfigArguments(request.folder);
-  const pathArgs =
-    configArgs.length === 0
-      ? await detectDefaultPathArguments(request.folder)
-      : [];
+  const pathArgs = await detectDefaultPathArguments(request.folder);
 
   const lintingResults = await execSwiftlint(
     request.folder.uri,
@@ -97,7 +94,7 @@ async function detectConfigArguments(
     "./";
   const searchPaths = Current.config
     .lintConfigSearchPaths()
-    .map(current => join(rootPath, current));
+    .map(current => resolve(rootPath, current));
   const existingConfig = searchPaths.find(existsSync);
   return existingConfig ? ["--config", existingConfig] : [];
 }
