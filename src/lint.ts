@@ -30,7 +30,7 @@ interface Report {
 
 export async function diagnosticsForDocument(request: {
   document: TextDocument;
-  parameters?: string[];
+  parameters: string[];
 }) {
   const input = request.document.getText();
   if (input.trim() === "") {
@@ -40,14 +40,17 @@ export async function diagnosticsForDocument(request: {
   if (lintingPaths.length === 0) {
     return [];
   }
-  const lintingResults = await execSwiftlint(
-    request.document.uri,
-    request.parameters || [],
-    {
+  const configArgs = await detectConfigArguments(null);
+
+  const lintingResults = await execSwiftlint({
+    uri: request.document.uri,
+    files: [],
+    parameters: [...configArgs, ...request.parameters],
+    options: {
       encoding: "utf8",
       input
     }
-  );
+  });
   try {
     const reports: Report[] = JSON.parse(lintingResults) || [];
     const diagnostics = reports.map(
@@ -67,14 +70,15 @@ export async function diagnosticsForFolder(request: {
   const configArgs = await detectConfigArguments(request.folder);
   const pathArgs = await detectDefaultPathArguments(request.folder);
 
-  const lintingResults = await execSwiftlint(
-    request.folder.uri,
-    [...configArgs, ...pathArgs, ...(request.parameters || [])],
-    {
+  const lintingResults = await execSwiftlint({
+    uri: request.folder.uri,
+    parameters: [...configArgs, ...(request.parameters || [])],
+    files: pathArgs,
+    options: {
       encoding: "utf8",
       env: process.env
     }
-  );
+  });
   const reports: Report[] = JSON.parse(lintingResults) || [];
   const diagnostics = reports.map(reportToSimpleDiagnostic());
   const diagnosticsByFile = new Map<string, Diagnostic[]>();
@@ -131,7 +135,11 @@ function reportToPreciseDiagnosticForDocument(
       }
 
       const severity = reportSeverityToDiagnosticSeverity(report.severity);
-      return new Diagnostic(range, report.reason, severity);
+      return new Diagnostic(
+        range,
+        diagnosticMessageForReport(report),
+        severity
+      );
     } catch (error) {
       throw error;
     }
@@ -148,9 +156,17 @@ function reportToSimpleDiagnostic(): (
     const severity = reportSeverityToDiagnosticSeverity(report.severity);
     return {
       file: report.file,
-      diagnostic: new Diagnostic(range, report.reason, severity)
+      diagnostic: new Diagnostic(
+        range,
+        diagnosticMessageForReport(report),
+        severity
+      )
     };
   };
+}
+
+function diagnosticMessageForReport(report: Report): string {
+  return `${report.reason} (${report.rule_id})`;
 }
 
 function reportSeverityToDiagnosticSeverity(
@@ -165,20 +181,46 @@ function reportSeverityToDiagnosticSeverity(
   }
 }
 
-function execSwiftlint(
-  uri: Uri,
-  parameters: string[],
-  options: ExecFileOptionsWithStringEncoding & { input?: string }
-): Promise<string> {
+function execSwiftlint(request: {
+  uri: Uri;
+  parameters: string[];
+  files: string[];
+  options: ExecFileOptionsWithStringEncoding & { input?: string };
+}): Promise<string> {
+  const filesEnv: NodeJS.ProcessEnv =
+    request.files.length === 0
+      ? {}
+      : Object.assign(
+          {},
+          ...request.files.map(
+            (fileName, index): NodeJS.ProcessEnv => ({
+              [`SCRIPT_INPUT_FILE_${index}`]: fileName
+            })
+          )
+        );
+  const filesModeParameters =
+    request.files.length !== 0 ? ["--use-script-input-files"] : [];
+
   return new Promise((resolve, reject) => {
     const exec = execFile(
-      Current.config.swiftLintPath(uri),
-      ["--quiet", "--reporter", "json", ...parameters],
+      Current.config.swiftLintPath(request.uri),
+      [
+        ...filesModeParameters,
+        "--quiet",
+        "--reporter",
+        "json",
+        ...request.parameters
+      ],
       {
         encoding: "utf8",
-        env: process.env,
-        maxBuffer: 1024 * 500,
-        ...(options || {})
+        maxBuffer: 10 * 1024 * 1024,
+        ...(request.options || {}),
+        env: {
+          ...process.env,
+          ...(request.options || {}).env,
+          ...filesEnv,
+          SCRIPT_INPUT_FILE_COUNT: `${request.files.length}`
+        }
       },
       (error, stdout, stderr) => {
         if (error && isExecException(error) && error.code === 2) {
@@ -198,8 +240,8 @@ function execSwiftlint(
         }
       }
     );
-    if (options.input !== undefined) {
-      exec.stdin!.end(options.input);
+    if (request.options.input !== undefined) {
+      exec.stdin!.end(request.options.input);
     }
   });
 }

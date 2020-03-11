@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Feature: Display rule id alongside with description
+- Fixed: `E2BIG` errors #9, #10
+- Fixed: Config search paths was not repsected for single files #8
+
 ## 1.0.5
 
 - Fixed: `swiftlint.configSearchPaths` did not support `~` #8
