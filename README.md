@@ -41,11 +41,12 @@ let package = Package(
 
 ## Configuration
 
-| Config                        | Type       | Default                    | Description                                       |
-| ----------------------------- | ---------- | -------------------------- | ------------------------------------------------- |
-| `swiftlint.enable`            | `Bool`     | `true`                     | Whether SwiftLint should actually do something.   |
-| `swiftlint.path`              | `String`   | `/usr/local/bin/swiftlint` | The location of the globally installed SwiftLint. |
-| `swiftlint.configSearchPaths` | `[String]` | `[".swiftlint.yml"]`       | Possible paths for SwiftLint config.              |
+| Config                        | Type       | Default                                      | Description                                          |
+| ----------------------------- | ---------- | -------------------------------------------- | ---------------------------------------------------- |
+| `swiftlint.enable`            | `Bool`     | `true`                                       | Whether SwiftLint should actually do something.      |
+| `swiftlint.path`              | `String`   | `/usr/local/bin/swiftlint`                   | The location of the globally installed SwiftLint.    |
+| `swiftlint.configSearchPaths` | `[String]` | `[".swiftlint.yml"]`                         | Possible paths for SwiftLint config.                 |
+| `swiftlint.forceExcludePaths` | `[String]` | `["tmp","build",".build","Pods","Carthage"]` | Paths to be excluded from being passed to SwiftLint. |
 
 ## Contributors
 

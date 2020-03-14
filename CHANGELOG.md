@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- Feature: Introduced `swiftlint.forceExcludePaths` to exclude paths from being passed to SwiftLint #12
+
 ## 1.1.0
 
 - Feature: Display rule id alongside with description

@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/vknabel/vscode-swiftlint"
   },
-  "version": "1.1.0",
+  "version": "1.2.0",
   "license": "MIT",
   "author": {
     "name": "Valentin Knabel",
@@ -64,6 +64,14 @@
             ".swiftlint.yml"
           ],
           "description": "Possible paths for SwiftLint config.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "swiftlint.forceExcludePaths": {
+          "type": "array",
+          "description": "Paths to be excluded from being passed to SwiftLint",
+          "default": ["tmp","build",".build","Pods","Carthage"],
           "items": {
             "type": "string"
           }

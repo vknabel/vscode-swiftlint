@@ -20,6 +20,7 @@ export interface Current {
     resetSwiftLintPath(): void;
     configureSwiftLintPath(): void;
     lintConfigSearchPaths(): string[];
+    forceExcludePaths(): string[];
   };
 }
 
@@ -90,7 +91,17 @@ export function prodEnvironment(): Current {
         vscode.workspace
           .getConfiguration()
           .get("swiftlint.configSearchPaths", [".swiftlint.yml"])
-          .map(absolutePath)
+          .map(absolutePath),
+      forceExcludePaths: () =>
+        vscode.workspace
+          .getConfiguration()
+          .get<string[]>("swiftlint.forceExcludePaths", [
+            "tmp",
+            "build",
+            ".build",
+            "Pods",
+            "Carthage"
+          ])
     }
   };
 }
