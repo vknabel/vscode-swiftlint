@@ -17,6 +17,8 @@ import {
 import Current from "./Current";
 import { resolve } from "path";
 import { existsSync } from "fs";
+import { SwiftLintConfig } from "./SwiftLintConfig";
+import { Document } from "yaml";
 
 interface Report {
   character: number | null;
@@ -36,11 +38,19 @@ export async function diagnosticsForDocument(request: {
   if (input.trim() === "") {
     return [];
   }
-  const lintingPaths = request.parameters || [];
+  const config = await SwiftLintConfig.search(workspaceRoot(null));
+  const configArgs = config?.arguments() || [];
+
+  if (config && !(await config.includes(request.document.uri.fsPath))) {
+    return [];
+  }
+
+  const lintingPaths = config
+    ? await filterAsync(request.parameters || [], path => config.includes(path))
+    : request.parameters || [];
   if (lintingPaths.length === 0) {
     return [];
   }
-  const configArgs = await detectConfigArguments(null);
 
   const lintingResults = await execSwiftlint({
     uri: request.document.uri,
@@ -67,7 +77,8 @@ export async function diagnosticsForFolder(request: {
   folder: WorkspaceFolder;
   parameters?: string[];
 }) {
-  const configArgs = await detectConfigArguments(request.folder);
+  const config = await SwiftLintConfig.search(workspaceRoot(request.folder));
+  const configArgs = config?.arguments() || [];
   const pathArgs = await detectDefaultPathArguments(request.folder);
 
   const lintingResults = await execSwiftlint({
@@ -89,18 +100,12 @@ export async function diagnosticsForFolder(request: {
   return diagnosticsByFile;
 }
 
-async function detectConfigArguments(
-  workspaceFolder: WorkspaceFolder | null
-): Promise<string[]> {
-  const rootPath =
+function workspaceRoot(workspaceFolder: WorkspaceFolder | null): string {
+  return (
     (workspaceFolder && workspaceFolder.uri.fsPath) ||
     workspace.rootPath ||
-    "./";
-  const searchPaths = Current.config
-    .lintConfigSearchPaths()
-    .map(current => resolve(rootPath, current));
-  const existingConfig = searchPaths.find(existsSync);
-  return existingConfig ? ["--config", existingConfig] : [];
+    "./"
+  );
 }
 
 async function detectDefaultPathArguments(
@@ -223,7 +228,7 @@ function execSwiftlint(request: {
           SCRIPT_INPUT_FILE_COUNT: `${request.files.length}`
         }
       },
-      (error, stdout, stderr) => {
+      (error: any | ExecException | null, stdout, stderr) => {
         if (error && isExecException(error) && error.code === 2) {
           return resolve(stdout);
         } else if (
@@ -249,4 +254,18 @@ function execSwiftlint(request: {
 
 function isExecException(error: Error): error is ExecException {
   return "code" in error;
+}
+
+async function filterAsync<T>(
+  elements: T[],
+  predicate: (element: T) => Promise<boolean>
+): Promise<T[]> {
+  const remaining = Array<T>();
+  for (const element of elements) {
+    const matches = await predicate(element);
+    if (matches) {
+      remaining.push(element);
+    }
+  }
+  return remaining;
 }

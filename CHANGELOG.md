@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+- Bugfix: Parse excludes and includes of `.swiftlint.yml`-configs to match CLI behavior #12
+
 ## 1.2.0
 
 - Feature: Introduced `swiftlint.forceExcludePaths` to exclude paths from being passed to SwiftLint #12
