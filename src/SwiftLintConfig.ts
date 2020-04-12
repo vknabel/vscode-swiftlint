@@ -4,6 +4,7 @@ import { readFile, existsSync } from "fs";
 import Current from "./Current";
 import { resolve, dirname, normalize } from "path";
 import * as glob from "glob";
+import * as minimatch from "minimatch";
 
 export interface SwiftLintConfigData {
   included?: RelativeGlobPath[];
@@ -16,14 +17,14 @@ export class SwiftLintConfig {
   static async search(rootPath: string): Promise<SwiftLintConfig | null> {
     const searchPaths = Current.config
       .lintConfigSearchPaths()
-      .map(current => resolve(rootPath, current));
+      .map((current) => resolve(rootPath, current));
     const existingConfig = searchPaths.find(existsSync);
     return existingConfig ? await SwiftLintConfig.load(existingConfig) : null;
   }
 
   static async load(configPath: string): Promise<SwiftLintConfig> {
     const configData = await promisify(readFile)(configPath, {
-      encoding: "utf8"
+      encoding: "utf8",
     });
     const config: SwiftLintConfigData = YAML.parse(configData);
     return new SwiftLintConfig(configPath, config);
@@ -46,7 +47,7 @@ export class SwiftLintConfig {
       const matched = await this.hasMatch({
         basePath,
         documentPath: normalizedDocumentPath,
-        relativeGlobs: this.config.excluded
+        relativeGlobs: this.config.excluded,
       });
       if (matched) {
         return false;
@@ -60,7 +61,7 @@ export class SwiftLintConfig {
       return this.hasMatch({
         basePath,
         documentPath: normalizedDocumentPath,
-        relativeGlobs: this.config.included
+        relativeGlobs: this.config.included,
       });
     } else {
       return true;
@@ -73,15 +74,15 @@ export class SwiftLintConfig {
     relativeGlobs: string[];
   }): Promise<boolean> {
     const { basePath, documentPath, relativeGlobs } = options;
-    const matchingPaths = await Promise.all(
-      relativeGlobs.map(exclude =>
-        promisify(glob)(exclude, { cwd: basePath }).then(matches =>
-          matches.find(path =>
-            documentPath.startsWith(normalize(resolve(basePath, path)))
-          )
-        )
-      )
-    );
-    return matchingPaths.find(path => path !== undefined) !== undefined;
+    for (const relativePattern of relativeGlobs) {
+      const absolutePattern = relativePattern.includes("*")
+        ? resolve(basePath, relativePattern)
+        : resolve(basePath, relativePattern, "**/*.swift");
+      const matched = minimatch.match([documentPath], absolutePattern);
+      if (matched.length > 0) {
+        return true;
+      }
+    }
+    return false;
   }
 }

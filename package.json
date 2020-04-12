@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/vknabel/vscode-swiftlint"
   },
-  "version": "1.2.1",
+  "version": "1.2.2",
   "license": "MIT",
   "author": {
     "name": "Valentin Knabel",
@@ -103,6 +103,8 @@
     "vscode-test": "^1.2.2"
   },
   "dependencies": {
+    "@types/minimatch": "^3.0.3",
+    "minimatch": "^3.0.4",
     "yaml": "^1.8.2"
   }
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2
+
+- Bugfix: Previous release linting filters were broken #13
+
 ## 1.2.1
 
 - Bugfix: Parse excludes and includes of `.swiftlint.yml`-configs to match CLI behavior #12

@@ -7,18 +7,15 @@ import {
   WorkspaceFolder,
   Position,
   workspace,
-  RelativePattern
+  RelativePattern,
 } from "vscode";
 import {
   ExecException,
   execFile,
-  ExecFileOptionsWithStringEncoding
+  ExecFileOptionsWithStringEncoding,
 } from "child_process";
 import Current from "./Current";
-import { resolve } from "path";
-import { existsSync } from "fs";
 import { SwiftLintConfig } from "./SwiftLintConfig";
-import { Document } from "yaml";
 
 interface Report {
   character: number | null;
@@ -45,21 +42,14 @@ export async function diagnosticsForDocument(request: {
     return [];
   }
 
-  const lintingPaths = config
-    ? await filterAsync(request.parameters || [], path => config.includes(path))
-    : request.parameters || [];
-  if (lintingPaths.length === 0) {
-    return [];
-  }
-
   const lintingResults = await execSwiftlint({
     uri: request.document.uri,
     files: [],
     parameters: [...configArgs, ...request.parameters],
     options: {
       encoding: "utf8",
-      input
-    }
+      input,
+    },
   });
   try {
     const reports: Report[] = JSON.parse(lintingResults) || [];
@@ -76,19 +66,26 @@ export async function diagnosticsForDocument(request: {
 export async function diagnosticsForFolder(request: {
   folder: WorkspaceFolder;
   parameters?: string[];
-}) {
+}): Promise<Map<string, Diagnostic[]>> {
   const config = await SwiftLintConfig.search(workspaceRoot(request.folder));
   const configArgs = config?.arguments() || [];
-  const pathArgs = await detectDefaultPathArguments(request.folder);
+  const allFiles = await detectDefaultPathArguments(request.folder);
+
+  const includedFiles = config
+    ? await filterAsync(allFiles, (path) => config.includes(path))
+    : request.parameters || [];
+  if (includedFiles.length === 0) {
+    return new Map();
+  }
 
   const lintingResults = await execSwiftlint({
     uri: request.folder.uri,
     parameters: [...configArgs, ...(request.parameters || [])],
-    files: pathArgs,
+    files: includedFiles,
     options: {
       encoding: "utf8",
-      env: process.env
-    }
+      env: process.env,
+    },
   });
   const reports: Report[] = JSON.parse(lintingResults) || [];
   const diagnostics = reports.map(reportToSimpleDiagnostic());
@@ -115,7 +112,7 @@ async function detectDefaultPathArguments(
     new RelativePattern(workspaceFolder, "**/*.swift"),
     new RelativePattern(workspaceFolder, forceExcludePathsPattern())
   );
-  return fileUris.map(uri => uri.path);
+  return fileUris.map((uri) => uri.path);
 }
 
 function forceExcludePathsPattern(): string {
@@ -125,7 +122,7 @@ function forceExcludePathsPattern(): string {
 function reportToPreciseDiagnosticForDocument(
   document: TextDocument
 ): (report: Report) => Diagnostic {
-  return report => {
+  return (report) => {
     try {
       const line = document.lineAt(report.line - 1);
       let range: Range;
@@ -133,7 +130,7 @@ function reportToPreciseDiagnosticForDocument(
         range = line.range;
       } else {
         const wordBegin = line.range.start.translate({
-          characterDelta: report.character
+          characterDelta: report.character,
         });
         range =
           document.getWordRangeAtPosition(wordBegin) ||
@@ -155,7 +152,7 @@ function reportToPreciseDiagnosticForDocument(
 function reportToSimpleDiagnostic(): (
   report: Report
 ) => { file: string; diagnostic: Diagnostic } {
-  return report => {
+  return (report) => {
     const startPosition = new Position(report.line - 1, report.character || 0);
     const endPosition = startPosition.translate({ characterDelta: 1 });
     const range = new Range(startPosition, endPosition);
@@ -166,7 +163,7 @@ function reportToSimpleDiagnostic(): (
         range,
         diagnosticMessageForReport(report),
         severity
-      )
+      ),
     };
   };
 }
@@ -200,7 +197,7 @@ function execSwiftlint(request: {
           {},
           ...request.files.map(
             (fileName, index): NodeJS.ProcessEnv => ({
-              [`SCRIPT_INPUT_FILE_${index}`]: fileName
+              [`SCRIPT_INPUT_FILE_${index}`]: fileName,
             })
           )
         );
@@ -215,7 +212,7 @@ function execSwiftlint(request: {
         "--quiet",
         "--reporter",
         "json",
-        ...request.parameters
+        ...request.parameters,
       ],
       {
         encoding: "utf8",
@@ -225,8 +222,8 @@ function execSwiftlint(request: {
           ...process.env,
           ...(request.options || {}).env,
           ...filesEnv,
-          SCRIPT_INPUT_FILE_COUNT: `${request.files.length}`
-        }
+          SCRIPT_INPUT_FILE_COUNT: `${request.files.length}`,
+        },
       },
       (error: any | ExecException | null, stdout, stderr) => {
         if (error && isExecException(error) && error.code === 2) {
