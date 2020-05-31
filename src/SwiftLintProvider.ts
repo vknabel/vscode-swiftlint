@@ -4,7 +4,7 @@ import {
   languages,
   ExtensionContext,
   workspace,
-  WorkspaceFolder
+  WorkspaceFolder,
 } from "vscode";
 import { diagnosticsForDocument, diagnosticsForFolder } from "./lint";
 import { handleFormatError } from "./UserInteraction";
@@ -21,7 +21,7 @@ export class SwiftLint {
       this.lintDocument(document);
     });
 
-    workspace.onDidOpenTextDocument(document => {
+    workspace.onDidOpenTextDocument((document) => {
       this.lintDocument(document);
     });
 
@@ -29,13 +29,13 @@ export class SwiftLint {
   }
 
   public async lintDocument(document: TextDocument) {
-    if (document.languageId !== "swift") {
+    if (document.languageId !== "swift" || document.uri.scheme === "git") {
       return;
     }
     try {
       const diagnostics = await diagnosticsForDocument({
         document,
-        parameters: ["--use-stdin"]
+        parameters: ["--use-stdin"],
       });
       this.diagnosticCollection.set(document.uri, diagnostics);
     } catch (error) {
@@ -53,20 +53,22 @@ export class SwiftLint {
       }
     }
 
-    const lintWorkspaces = Array.from(workspaces.values()).map(async folder => {
-      try {
-        const diagnosticsByFile = await diagnosticsForFolder({ folder });
-        for (const file of diagnosticsByFile.keys()) {
-          this.diagnosticCollection.set(
-            folder.uri.with({ path: file }),
-            diagnosticsByFile.get(file)
-          );
+    const lintWorkspaces = Array.from(workspaces.values()).map(
+      async (folder) => {
+        try {
+          const diagnosticsByFile = await diagnosticsForFolder({ folder });
+          for (const file of diagnosticsByFile.keys()) {
+            this.diagnosticCollection.set(
+              folder.uri.with({ path: file }),
+              diagnosticsByFile.get(file)
+            );
+          }
+        } catch (error) {
+          console.log(error);
+          handleFormatError(error, folder.uri);
         }
-      } catch (error) {
-        console.log(error);
-        handleFormatError(error, folder.uri);
       }
-    });
+    );
 
     await Promise.all(lintWorkspaces);
   }

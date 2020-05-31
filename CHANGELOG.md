@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.3
+
+- Bugfix: Linted `git:` files #16
+
 ## 1.2.2
 
 - Bugfix: Previous release linting filters were broken #13
