@@ -1,3 +1,6 @@
+import * as os from "os";
+import * as fs from "fs";
+
 export interface Current {
   editor: {
     openURL(url: string): Thenable<void>;
@@ -17,8 +20,9 @@ export interface Current {
     isEnabled(): boolean;
 
     swiftLintPath(uri: vscode.Uri): string;
+    toolchainPath(): string | undefined;
     resetSwiftLintPath(): void;
-    configureSwiftLintPath(): void;
+    openSettings(): void;
     lintConfigSearchPaths(): string[];
     forceExcludePaths(): string[];
   };
@@ -40,9 +44,10 @@ export function prodEnvironment(): Current {
         );
       },
       async reportIssueForError(error) {
-        const title = `Report ${error.code || ""} ${error.message ||
-          ""}`.replace(/\\n/, " ");
-        const body = "`" + (error.stack || JSON.stringify(error)) + "`";
+        const title = `Report ${error.code || ""} ${
+          error.message || ""
+        }`.replace(/\\n/, " ");
+        const body = encodeURIComponent(`\`${error.stack || JSON.stringify(error)}\nos: ${os.platform()}\``);
         await Current.editor.openURL(
           url`https://github.com/vknabel/vscode-swiftlint/issues/new?title=${title}&body=${body}`
         );
@@ -57,7 +62,7 @@ export function prodEnvironment(): Current {
       ) =>
         vscode.window.showWarningMessage(message, ...actions) as Thenable<
           T | undefined
-        >
+        >,
     },
     config: {
       isEnabled: () =>
@@ -66,7 +71,7 @@ export function prodEnvironment(): Current {
         // Support running from Swift PM projects
         const possibleLocalPaths = [
           ".build/release/swiftlint",
-          ".build/debug/swiftlint"
+          ".build/debug/swiftlint",
         ];
         for (const path of possibleLocalPaths) {
           // Grab the project root from the local workspace
@@ -83,9 +88,27 @@ export function prodEnvironment(): Current {
         // Fall back to global defaults found in settings
         return fallbackGlobalSwiftFormatPath();
       },
+      toolchainPath: () => {
+        const toolchainPath:
+          | string
+          | undefined = vscode.workspace
+          .getConfiguration()
+          .get("swiftlint.toolchainPath");
+        if (toolchainPath) {
+          return toolchainPath;
+        }
+        if (os.platform() === "darwin") {
+          return [
+            "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain",
+            "/Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain",
+            "~/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain",
+            "~/Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain"
+          ].find(tool => fs.existsSync(tool));
+        }
+      },
       resetSwiftLintPath: () =>
         vscode.workspace.getConfiguration().update("swiftlint.path", undefined),
-      configureSwiftLintPath: () =>
+      openSettings: () =>
         vscode.commands.executeCommand("workbench.action.openSettings"),
       lintConfigSearchPaths: () =>
         vscode.workspace
@@ -100,9 +123,9 @@ export function prodEnvironment(): Current {
             "build",
             ".build",
             "Pods",
-            "Carthage"
-          ])
-    }
+            "Carthage",
+          ]),
+    },
   };
 }
 

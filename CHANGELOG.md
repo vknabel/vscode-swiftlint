@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.4
+
+- Bugfix: `EPIPE` with Command Line Tools selected #11
+
 ## 1.2.3
 
 - Bugfix: Linted `git:` files #16

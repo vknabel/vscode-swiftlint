@@ -201,6 +201,10 @@ function execSwiftlint(request: {
             })
           )
         );
+
+  const toolchainEnv = Current.config.toolchainPath()
+    ? { TOOLCHAIN_DIR: Current.config.toolchainPath() }
+    : {};
   const filesModeParameters =
     request.files.length !== 0 ? ["--use-script-input-files"] : [];
 
@@ -217,15 +221,16 @@ function execSwiftlint(request: {
       {
         encoding: "utf8",
         maxBuffer: 10 * 1024 * 1024,
-        ...(request.options || {}),
+        ...(request.options || {}) as any,
         env: {
           ...process.env,
+          ...toolchainEnv,
           ...(request.options || {}).env,
           ...filesEnv,
           SCRIPT_INPUT_FILE_COUNT: `${request.files.length}`,
         },
       },
-      (error: any | ExecException | null, stdout, stderr) => {
+      (error: any | ExecException | null, stdout: string | any, stderr) => {
         if (error && isExecException(error) && error.code === 2) {
           return resolve(stdout);
         } else if (
