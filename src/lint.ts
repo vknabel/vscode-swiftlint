@@ -72,11 +72,10 @@ export async function diagnosticsForFolder(request: {
   const allFiles = await detectDefaultPathArguments(request.folder);
 
   const includedFiles = config
-    ? await filterAsync(allFiles, (path) => config.includes(path))
+    ? (await config.includes(request.folder.uri.path))
+      ? []
+      : await filterAsync(allFiles, (path) => config.includes(path))
     : request.parameters || [];
-  if (includedFiles.length === 0) {
-    return new Map();
-  }
 
   const lintingResults = await execSwiftlint({
     uri: request.folder.uri,
@@ -220,8 +219,8 @@ function execSwiftlint(request: {
       ],
       {
         encoding: "utf8",
-        maxBuffer: 10 * 1024 * 1024,
-        ...(request.options || {}) as any,
+        maxBuffer: 20 * 1024 * 1024,
+        ...((request.options || {}) as any),
         env: {
           ...process.env,
           ...toolchainEnv,

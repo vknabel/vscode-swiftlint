@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.5
+
+- Fix crash on empty .swiftlint.yml-files
+- Better support for .swiftlint.yml without includes or excludes
+- Increased buffer size for Linting results
+- Reduced amount of paths transferred to SwiftLint
+
 ## 1.2.4
 
 - Bugfix: `EPIPE` with Command Line Tools selected #11

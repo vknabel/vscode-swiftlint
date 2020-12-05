@@ -30,10 +30,14 @@ export class SwiftLintConfig {
     return new SwiftLintConfig(configPath, config);
   }
 
+  private readonly config: SwiftLintConfigData;
+
   constructor(
     private readonly path: string,
-    private readonly config: SwiftLintConfigData
-  ) {}
+    config: SwiftLintConfigData | null
+  ) {
+    this.config = config || {};
+  }
 
   public arguments(): string[] {
     return ["--config", this.path];
