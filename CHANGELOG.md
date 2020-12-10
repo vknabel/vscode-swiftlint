@@ -1,8 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Pass correct working directory to SwiftLint #24
+
 ## 1.2.6
 
-- Re-release 1.2.4
+- Re-release 1.2.4 #24
 
 ## 1.2.5
 

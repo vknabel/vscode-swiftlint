@@ -16,6 +16,7 @@ import {
 } from "child_process";
 import Current from "./Current";
 import { SwiftLintConfig } from "./SwiftLintConfig";
+import { Document } from "yaml";
 
 interface Report {
   character: number | null;
@@ -30,12 +31,13 @@ interface Report {
 export async function diagnosticsForDocument(request: {
   document: TextDocument;
   parameters: string[];
+  workspaceFolder: WorkspaceFolder
 }) {
   const input = request.document.getText();
   if (input.trim() === "") {
     return [];
   }
-  const config = await SwiftLintConfig.search(workspaceRoot(null));
+  const config = await SwiftLintConfig.search(workspaceRoot(request.workspaceFolder));
   const configArgs = config?.arguments() || [];
 
   if (config && !(await config.includes(request.document.uri.fsPath))) {
@@ -45,6 +47,7 @@ export async function diagnosticsForDocument(request: {
   const lintingResults = await execSwiftlint({
     uri: request.document.uri,
     files: [],
+    cwd: workspaceRoot(request.workspaceFolder),
     parameters: [...configArgs, ...request.parameters],
     options: {
       encoding: "utf8",
@@ -81,6 +84,7 @@ export async function diagnosticsForFolder(request: {
     uri: request.folder.uri,
     parameters: [...configArgs, ...(request.parameters || [])],
     files: includedFiles,
+    cwd: workspaceRoot(request.folder),
     options: {
       encoding: "utf8",
       env: process.env,
@@ -187,6 +191,7 @@ function execSwiftlint(request: {
   uri: Uri;
   parameters: string[];
   files: string[];
+  cwd: string;
   options: ExecFileOptionsWithStringEncoding & { input?: string };
 }): Promise<string> {
   const filesEnv: NodeJS.ProcessEnv =
@@ -228,6 +233,7 @@ function execSwiftlint(request: {
           ...filesEnv,
           SCRIPT_INPUT_FILE_COUNT: `${request.files.length}`,
         },
+        cwd: request.cwd
       },
       (error: any | ExecException | null, stdout: string | any, stderr) => {
         if (error && isExecException(error) && error.code === 2) {

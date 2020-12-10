@@ -36,6 +36,7 @@ export class SwiftLint {
       const diagnostics = await diagnosticsForDocument({
         document,
         parameters: ["--use-stdin"],
+        workspaceFolder: workspace.getWorkspaceFolder(document.uri) || workspace.workspaceFolders![0]
       });
       this.diagnosticCollection.set(document.uri, diagnostics);
     } catch (error) {
