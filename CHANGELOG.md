@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.6
+
+- Re-release 1.2.4
+
 ## 1.2.5
 
 - Fix crash on empty .swiftlint.yml-files
