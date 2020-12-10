@@ -11,12 +11,11 @@ import {
 } from "vscode";
 import {
   ExecException,
-  execFile,
   ExecFileOptionsWithStringEncoding,
 } from "child_process";
 import Current from "./Current";
 import { SwiftLintConfig } from "./SwiftLintConfig";
-import { Document } from "yaml";
+import { execShell } from "./execShell";
 
 interface Report {
   character: number | null;
@@ -31,13 +30,15 @@ interface Report {
 export async function diagnosticsForDocument(request: {
   document: TextDocument;
   parameters: string[];
-  workspaceFolder: WorkspaceFolder
+  workspaceFolder: WorkspaceFolder;
 }) {
   const input = request.document.getText();
   if (input.trim() === "") {
     return [];
   }
-  const config = await SwiftLintConfig.search(workspaceRoot(request.workspaceFolder));
+  const config = await SwiftLintConfig.search(
+    workspaceRoot(request.workspaceFolder)
+  );
   const configArgs = config?.arguments() || [];
 
   if (config && !(await config.includes(request.document.uri.fsPath))) {
@@ -213,7 +214,7 @@ function execSwiftlint(request: {
     request.files.length !== 0 ? ["--use-script-input-files"] : [];
 
   return new Promise((resolve, reject) => {
-    const exec = execFile(
+    const exec = execShell(
       Current.config.swiftLintPath(request.uri),
       [
         ...filesModeParameters,
@@ -233,7 +234,7 @@ function execSwiftlint(request: {
           ...filesEnv,
           SCRIPT_INPUT_FILE_COUNT: `${request.files.length}`,
         },
-        cwd: request.cwd
+        cwd: request.cwd,
       },
       (error: any | ExecException | null, stdout: string | any, stderr) => {
         if (error && isExecException(error) && error.code === 2) {
