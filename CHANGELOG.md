@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.7-beta.0
+## 1.2.7
 
 - Pass correct working directory to SwiftLint #24
 - Kill remaining SwiftLint processes on deactivate #24
