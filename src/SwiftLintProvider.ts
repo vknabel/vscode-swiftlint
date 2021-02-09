@@ -5,7 +5,9 @@ import {
   ExtensionContext,
   workspace,
   WorkspaceFolder,
+  commands,
 } from "vscode";
+import Current from "./Current";
 import { diagnosticsForDocument, diagnosticsForFolder } from "./lint";
 import { handleFormatError } from "./UserInteraction";
 
@@ -16,6 +18,14 @@ export class SwiftLint {
     this.diagnosticCollection = languages.createDiagnosticCollection(
       "SwiftLint"
     );
+    commands.registerCommand(Current.commands.lintWorkspace, () => {
+      this.lintWorkspace();
+    });
+    workspace.onDidChangeConfiguration((configChange) => {
+      if (Current.config.affectsConfiguration(configChange)) {
+        this.lintWorkspaceIfNeeded();
+      }
+    });
 
     workspace.onDidChangeTextDocument(({ document }) => {
       this.lintDocument(document);
@@ -25,7 +35,13 @@ export class SwiftLint {
       this.lintDocument(document);
     });
 
-    this.lintWorkspace();
+    this.lintWorkspaceIfNeeded();
+  }
+
+  private lintWorkspaceIfNeeded() {
+    if (Current.config.autoLintWorkspace()) {
+      this.lintWorkspace();
+    }
   }
 
   public async lintDocument(document: TextDocument) {
@@ -36,7 +52,9 @@ export class SwiftLint {
       const diagnostics = await diagnosticsForDocument({
         document,
         parameters: ["--use-stdin"],
-        workspaceFolder: workspace.getWorkspaceFolder(document.uri) || workspace.workspaceFolders![0]
+        workspaceFolder:
+          workspace.getWorkspaceFolder(document.uri) ||
+          workspace.workspaceFolders![0],
       });
       this.diagnosticCollection.set(document.uri, diagnostics);
     } catch (error) {

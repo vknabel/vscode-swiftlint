@@ -16,8 +16,12 @@ export interface Current {
       ...actions: T[]
     ): Thenable<T | undefined>;
   };
+  commands: {
+    lintWorkspace: string;
+  };
   config: {
     isEnabled(): boolean;
+    affectsConfiguration(changeEvent: vscode.ConfigurationChangeEvent): boolean;
 
     swiftLintPath(uri: vscode.Uri): string;
     toolchainPath(): string | undefined;
@@ -25,6 +29,7 @@ export interface Current {
     openSettings(): void;
     lintConfigSearchPaths(): string[];
     forceExcludePaths(): string[];
+    autoLintWorkspace(): boolean;
   };
 }
 
@@ -47,7 +52,9 @@ export function prodEnvironment(): Current {
         const title = `Report ${error.code || ""} ${
           error.message || ""
         }`.replace(/\\n/, " ");
-        const body = encodeURIComponent(`\`${error.stack || JSON.stringify(error)}\nos: ${os.platform()}\``);
+        const body = encodeURIComponent(
+          `\`${error.stack || JSON.stringify(error)}\nos: ${os.platform()}\``
+        );
         await Current.editor.openURL(
           url`https://github.com/vknabel/vscode-swiftlint/issues/new?title=${title}&body=${body}`
         );
@@ -64,9 +71,18 @@ export function prodEnvironment(): Current {
           T | undefined
         >,
     },
+    commands: {
+      lintWorkspace: "swiftlint.lintWorkspace",
+    },
     config: {
+      affectsConfiguration: (changeEvent: vscode.ConfigurationChangeEvent) =>
+        changeEvent.affectsConfiguration("swiftlint"),
       isEnabled: () =>
         vscode.workspace.getConfiguration().get("swiftlint.enable", true),
+      autoLintWorkspace: () =>
+        vscode.workspace
+          .getConfiguration()
+          .get("swiftlint.autoLintWorkspace", true),
       swiftLintPath: (uri: vscode.Uri) => {
         // Support running from Swift PM projects
         const possibleLocalPaths = [
@@ -102,8 +118,8 @@ export function prodEnvironment(): Current {
             "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain",
             "/Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain",
             "~/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain",
-            "~/Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain"
-          ].find(tool => fs.existsSync(tool));
+            "~/Applications/Xcode-beta.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain",
+          ].find((tool) => fs.existsSync(tool));
         }
       },
       resetSwiftLintPath: () =>

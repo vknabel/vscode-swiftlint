@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/vknabel/vscode-swiftlint"
   },
-  "version": "1.2.7",
+  "version": "1.3.0",
   "license": "MIT",
   "author": {
     "name": "Valentin Knabel",
@@ -35,7 +35,8 @@
   ],
   "activationEvents": [
     "onLanguage:swift",
-    "workspaceContains:**/*swift"
+    "workspaceContains:**/*swift",
+    "onCommand:swiftlint.lintWorkspace"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -74,7 +75,7 @@
         },
         "swiftlint.forceExcludePaths": {
           "type": "array",
-          "description": "Paths to be excluded from being passed to SwiftLint",
+          "description": "Paths to be excluded from being passed to SwiftLint.",
           "default": [
             "tmp",
             "build",
@@ -85,9 +86,20 @@
           "items": {
             "type": "string"
           }
+        },
+        "swiftlint.autoLintWorkspace": {
+          "type": "boolean",
+          "description": "Automatically lint the whole project right after start.",
+          "default": true
         }
       }
-    }
+    },
+    "commands": [
+      {
+        "title": "SwiftLint: Lint workspace",
+        "command": "swiftlint.lintWorkspace"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",

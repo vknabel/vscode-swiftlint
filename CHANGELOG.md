@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+- Added setting `swiftlint.autoLintWorkspace` to en-/disable workspace linting on extension startup #25
+- Added command `swiftlint.lintWorkspace` to manually lint the whole project #25
+
 ## 1.2.7
 
 - Pass correct working directory to SwiftLint #24

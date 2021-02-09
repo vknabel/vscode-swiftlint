@@ -3,7 +3,6 @@ import { promisify } from "util";
 import { readFile, existsSync } from "fs";
 import Current from "./Current";
 import { resolve, dirname, normalize } from "path";
-import * as glob from "glob";
 import * as minimatch from "minimatch";
 
 export interface SwiftLintConfigData {
