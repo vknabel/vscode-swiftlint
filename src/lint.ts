@@ -16,6 +16,7 @@ import {
 import Current from "./Current";
 import { SwiftLintConfig } from "./SwiftLintConfig";
 import { execShell } from "./execShell";
+import * as path from "path";
 
 interface Report {
   character: number | null;
@@ -45,10 +46,13 @@ export async function diagnosticsForDocument(request: {
     return [];
   }
 
+  const containingDirectory = path.normalize(
+    path.join(request.document.uri.fsPath, "..")
+  );
   const lintingResults = await execSwiftlint({
     uri: request.document.uri,
     files: [],
-    cwd: workspaceRoot(request.workspaceFolder),
+    cwd: containingDirectory,
     parameters: [...configArgs, ...request.parameters],
     options: {
       encoding: "utf8",

@@ -10,6 +10,7 @@ import {
 import Current from "./Current";
 import { diagnosticsForDocument, diagnosticsForFolder } from "./lint";
 import { handleFormatError } from "./UserInteraction";
+import * as path from "path";
 
 export class SwiftLint {
   private diagnosticCollection!: DiagnosticCollection;
@@ -27,6 +28,11 @@ export class SwiftLint {
       }
     });
 
+    workspace.onDidSaveTextDocument((document) => {
+      if (path.basename(document.fileName) === ".swiftlint.yml") {
+        this.lintWorkspaceIfNeeded();
+      }
+    });
     workspace.onDidChangeTextDocument(({ document }) => {
       this.lintDocument(document);
     });

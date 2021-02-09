@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0
+
+- Nested configurations support #23
+
 ## 1.3.0
 
 - Added setting `swiftlint.autoLintWorkspace` to en-/disable workspace linting on extension startup #25
