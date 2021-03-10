@@ -129,7 +129,7 @@ export function prodEnvironment(): Current {
       lintConfigSearchPaths: () =>
         vscode.workspace
           .getConfiguration()
-          .get("swiftlint.configSearchPaths", [".swiftlint.yml"])
+          .get("swiftlint.configSearchPaths", [])
           .map(absolutePath),
       forceExcludePaths: () =>
         vscode.workspace

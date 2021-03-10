@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.4.1
+## 1.4.3
+
+- Nested configurations were not supported by default #30
+
+## 1.4.2
 
 - Reference EBADF-issue #28 #31 (wrong url)
 
