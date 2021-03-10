@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1
+
+- Reference EBADF-issue #28 #31
+
 ## 1.4.0
 
 - Nested configurations support #23

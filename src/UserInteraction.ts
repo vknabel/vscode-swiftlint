@@ -3,16 +3,20 @@ import Current from "./Current";
 
 enum FormatErrorInteraction {
   configure = "Configure",
-  reset = "Reset"
+  reset = "Reset",
 }
 
 enum PipeErrorInteraction {
   configure = "Configure",
-  seeReport = "See Report"
+  seeReport = "See Report",
+}
+
+enum UnfixedErrorInteraction {
+  seeReport = "See Report",
 }
 
 enum UnknownErrorInteraction {
-  reportIssue = "Report issue"
+  reportIssue = "Report issue",
 }
 
 export async function handleFormatError(error: any, uri: vscode.Uri) {
@@ -24,7 +28,9 @@ export async function handleFormatError(error: any, uri: vscode.Uri) {
     );
     switch (selection) {
       case PipeErrorInteraction.seeReport:
-        Current.editor.openURL("https://github.com/vknabel/vscode-swiftlint/issues/11#issuecomment-641667855");
+        Current.editor.openURL(
+          "https://github.com/vknabel/vscode-swiftlint/issues/11#issuecomment-641667855"
+        );
         break;
       case PipeErrorInteraction.configure:
         Current.config.openSettings();
@@ -42,6 +48,18 @@ export async function handleFormatError(error: any, uri: vscode.Uri) {
         break;
       case FormatErrorInteraction.configure:
         Current.config.openSettings();
+        break;
+    }
+  } else if (error.code === "EBADF") {
+    const selection = await Current.editor.showErrorMessage(
+      `SwiftLint failed. EBADF #28. Do you have additional information?`,
+      UnfixedErrorInteraction.seeReport
+    );
+    switch (selection) {
+      case UnfixedErrorInteraction.seeReport:
+        Current.editor.openURL(
+          "https://github.com/vknabel/vscode-swiftlint/issues/28"
+        );
         break;
     }
   } else if (error.status === 70) {
