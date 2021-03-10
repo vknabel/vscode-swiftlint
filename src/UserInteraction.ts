@@ -58,7 +58,7 @@ export async function handleFormatError(error: any, uri: vscode.Uri) {
     switch (selection) {
       case UnfixedErrorInteraction.seeReport:
         Current.editor.openURL(
-          "https://github.com/vknabel/vscode-swiftlint/issues/28"
+          "https://github.com/vknabel/vscode-swiftlint/issues/31"
         );
         break;
     }
