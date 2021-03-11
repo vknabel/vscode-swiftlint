@@ -31,10 +31,9 @@ export class SwiftLint {
     workspace.onDidSaveTextDocument((document) => {
       if (path.basename(document.fileName) === ".swiftlint.yml") {
         this.lintWorkspaceIfNeeded();
+      } else {
+        this.lintDocument(document);
       }
-    });
-    workspace.onDidChangeTextDocument(({ document }) => {
-      this.lintDocument(document);
     });
 
     workspace.onDidOpenTextDocument((document) => {
@@ -55,12 +54,13 @@ export class SwiftLint {
       return;
     }
     try {
+      const workspaceFolder =
+        workspace.getWorkspaceFolder(document.uri) ||
+        workspace.workspaceFolders![0];
       const diagnostics = await diagnosticsForDocument({
         document,
-        parameters: ["--use-stdin"],
-        workspaceFolder:
-          workspace.getWorkspaceFolder(document.uri) ||
-          workspace.workspaceFolders![0],
+        parameters: [],
+        workspaceFolder,
       });
       this.diagnosticCollection.set(document.uri, diagnostics);
     } catch (error) {

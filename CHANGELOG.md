@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.4
+
+- Pass currently linted file path to Swiftlint #30 after save
+
 ## 1.4.3
 
 - Nested configurations were not supported by default #30

@@ -46,13 +46,14 @@ export async function diagnosticsForDocument(request: {
     return [];
   }
 
-  const containingDirectory = path.normalize(
-    path.join(request.document.uri.fsPath, "..")
+  const relativeDocumentPath = path.relative(
+    request.workspaceFolder.uri.fsPath,
+    request.document.uri.fsPath
   );
   const lintingResults = await execSwiftlint({
     uri: request.document.uri,
-    files: [],
-    cwd: containingDirectory,
+    files: [relativeDocumentPath],
+    cwd: request.workspaceFolder.uri.fsPath,
     parameters: [...configArgs, ...request.parameters],
     options: {
       encoding: "utf8",
@@ -210,6 +211,7 @@ function execSwiftlint(request: {
             })
           )
         );
+  filesEnv["SCRIPT_INPUT_FILE_COUNT"] = `${request.files.length}`;
 
   const toolchainEnv = Current.config.toolchainPath()
     ? { TOOLCHAIN_DIR: Current.config.toolchainPath() }
@@ -218,15 +220,25 @@ function execSwiftlint(request: {
     request.files.length !== 0 ? ["--use-script-input-files"] : [];
 
   return new Promise((resolve, reject) => {
+    const swiftLintPath = Current.config.swiftLintPath(request.uri);
+    const swiftLintArgs = [
+      ...filesModeParameters,
+      "--quiet",
+      "--reporter",
+      "json",
+      ...request.parameters,
+    ];
+    console.log(
+      `cd ${request.cwd} && `,
+      Object.keys(filesEnv)
+        .map((env) => `${env}='${filesEnv[env]}'`)
+        .join(" "),
+      `'${swiftLintPath}' `,
+      swiftLintArgs?.map((arg) => `'${arg}'`).join(" ")
+    );
     const exec = execShell(
-      Current.config.swiftLintPath(request.uri),
-      [
-        ...filesModeParameters,
-        "--quiet",
-        "--reporter",
-        "json",
-        ...request.parameters,
-      ],
+      swiftLintPath,
+      swiftLintArgs,
       {
         encoding: "utf8",
         maxBuffer: 20 * 1024 * 1024,
