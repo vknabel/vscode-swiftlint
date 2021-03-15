@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.5
+
+Fixes vulnerability which allowed malicous workspaces to execute code when opened by providing. Now the vulnerable configs cannot be overrided in workspaces anymore: `swiftlint.path`.
+
 ## 1.4.4
 
 - Pass currently linted file path to Swiftlint #30 after save

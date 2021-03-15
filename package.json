@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/vknabel/vscode-swiftlint"
   },
-  "version": "1.4.4",
+  "version": "1.4.5",
   "license": "MIT",
   "author": {
     "name": "Valentin Knabel",
@@ -57,7 +57,8 @@
         "swiftlint.path": {
           "type": "string",
           "default": "/usr/local/bin/swiftlint",
-          "description": "The location of your globally installed SwiftLint."
+          "description": "The location of your globally installed SwiftLint.",
+          "scope": "machine"
         },
         "swiftlint.toolchainPath": {
           "type": "string",
