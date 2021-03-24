@@ -2,7 +2,7 @@
 
 ## 1.4.5
 
-Fixes vulnerability which allowed malicous workspaces to execute code when opened by providing. Now the vulnerable configs cannot be overrided in workspaces anymore: `swiftlint.path`. Reported by [@Ry0taK](https://github.com/Ry0taK).
+[CVE-2021-28790](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-28790): Fixes vulnerability which allowed malicous workspaces to execute code when opened by providing. Now the vulnerable configs cannot be overrided in workspaces anymore: `swiftlint.path`. Reported by [@Ry0taK](https://github.com/Ry0taK).
 
 ## 1.4.4
 
