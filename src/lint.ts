@@ -31,7 +31,7 @@ interface Report {
 export async function diagnosticsForDocument(request: {
   document: TextDocument;
   parameters: string[];
-  workspaceFolder: WorkspaceFolder;
+  workspaceFolder: WorkspaceFolder | null;
 }) {
   const input = request.document.getText();
   if (input.trim() === "") {
@@ -46,14 +46,16 @@ export async function diagnosticsForDocument(request: {
     return [];
   }
 
+  const workspaceOrRoot =
+    request.workspaceFolder?.uri.fsPath ?? path.normalize("/");
   const relativeDocumentPath = path.relative(
-    request.workspaceFolder.uri.fsPath,
+    workspaceOrRoot,
     request.document.uri.fsPath
   );
   const lintingResults = await execSwiftlint({
     uri: request.document.uri,
     files: [relativeDocumentPath],
-    cwd: request.workspaceFolder.uri.fsPath,
+    cwd: workspaceOrRoot,
     parameters: [...configArgs, ...request.parameters],
     options: {
       encoding: "utf8",
@@ -158,9 +160,10 @@ function reportToPreciseDiagnosticForDocument(
   };
 }
 
-function reportToSimpleDiagnostic(): (
-  report: Report
-) => { file: string; diagnostic: Diagnostic } {
+function reportToSimpleDiagnostic(): (report: Report) => {
+  file: string;
+  diagnostic: Diagnostic;
+} {
   return (report) => {
     const startPosition = new Position(report.line - 1, report.character || 0);
     const endPosition = startPosition.translate({ characterDelta: 1 });

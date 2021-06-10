@@ -16,9 +16,8 @@ export class SwiftLint {
   private diagnosticCollection!: DiagnosticCollection;
 
   public activate(_context: ExtensionContext) {
-    this.diagnosticCollection = languages.createDiagnosticCollection(
-      "SwiftLint"
-    );
+    this.diagnosticCollection =
+      languages.createDiagnosticCollection("SwiftLint");
     commands.registerCommand(Current.commands.lintWorkspace, () => {
       this.lintWorkspace();
     });
@@ -55,8 +54,9 @@ export class SwiftLint {
     }
     try {
       const workspaceFolder =
-        workspace.getWorkspaceFolder(document.uri) ||
-        workspace.workspaceFolders![0];
+        (workspace.getWorkspaceFolder(document.uri) ||
+          workspace.workspaceFolders?.[0]) ??
+        null;
       const diagnostics = await diagnosticsForDocument({
         document,
         parameters: [],
