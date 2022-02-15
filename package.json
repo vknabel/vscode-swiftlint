@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/vknabel/vscode-swiftlint"
   },
-  "version": "1.4.6",
+  "version": "1.5.0",
   "license": "MIT",
   "author": {
     "name": "Valentin Knabel",
@@ -97,6 +97,16 @@
       {
         "title": "SwiftLint: Lint workspace",
         "command": "swiftlint.lintWorkspace"
+      },
+      {
+        "title": "SwiftLint: Fix all autocorrect issues in workspace",
+        "command": "swiftlint.fixWorkspace",
+        "shortTitle": "SwiftLint: Fix workspace"
+      },
+      {
+        "title": "SwiftLint: Fix all autocorrect issues in document",
+        "command": "swiftlint.fixDocument",
+        "shortTitle": "SwiftLint: Fix document"
       }
     ]
   },

@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.5.0
+
+- New commands to fix autocorrect workspace and file issues `swiftlint.fixWorkspace` and `swiftlint.fixDocument` #40
+
+To automatically fix all issues within a document on save, add the following to your `.vscode/settings.json`:
+
+```json
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  }
+}
+```
+
 ## 1.4.6
 
 - Support non-workspace linting, e.g. for specific files. #33 #35 #36

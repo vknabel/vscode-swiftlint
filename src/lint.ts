@@ -74,6 +74,63 @@ export async function diagnosticsForDocument(request: {
   }
 }
 
+export async function fixDocument(request: {
+  document: TextDocument;
+  parameters: string[];
+  workspaceFolder: WorkspaceFolder | null;
+}) {
+  const config = await SwiftLintConfig.search(
+    workspaceRoot(request.workspaceFolder)
+  );
+  const configArgs = config?.arguments() || [];
+
+  if (config && !(await config.includes(request.document.uri.fsPath))) {
+    return [];
+  }
+
+  const workspaceOrRoot =
+    request.workspaceFolder?.uri.fsPath ?? path.normalize("/");
+  const relativeDocumentPath = path.relative(
+    workspaceOrRoot,
+    request.document.uri.fsPath
+  );
+  await execSwiftlint({
+    uri: request.document.uri,
+    files: [relativeDocumentPath],
+    cwd: workspaceOrRoot,
+    parameters: [...configArgs, "--fix", ...request.parameters],
+    options: {
+      encoding: "utf8",
+    },
+  });
+}
+
+export async function fixForFolder(request: {
+  folder: WorkspaceFolder;
+  parameters?: string[];
+}): Promise<void> {
+  const config = await SwiftLintConfig.search(workspaceRoot(request.folder));
+  const configArgs = config?.arguments() || [];
+  const allFiles = await detectDefaultPathArguments(request.folder);
+
+  const includedFiles = config
+    ? (await config.includes(request.folder.uri.path))
+      ? []
+      : await filterAsync(allFiles, (path) => config.includes(path))
+    : request.parameters || [];
+
+  await execSwiftlint({
+    uri: request.folder.uri,
+    parameters: [...configArgs, "--fix", ...(request.parameters || [])],
+    files: includedFiles,
+    cwd: workspaceRoot(request.folder),
+    options: {
+      encoding: "utf8",
+      env: process.env,
+    },
+  });
+}
+
 export async function diagnosticsForFolder(request: {
   folder: WorkspaceFolder;
   parameters?: string[];

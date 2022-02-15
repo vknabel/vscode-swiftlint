@@ -18,6 +18,8 @@ export interface Current {
   };
   commands: {
     lintWorkspace: string;
+    fixWorkspace: string;
+    fixDocument: string;
   };
   config: {
     isEnabled(): boolean;
@@ -73,6 +75,8 @@ export function prodEnvironment(): Current {
     },
     commands: {
       lintWorkspace: "swiftlint.lintWorkspace",
+      fixWorkspace: "swiftlint.fixWorkspace",
+      fixDocument: "swiftlint.fixDocument",
     },
     config: {
       affectsConfiguration: (changeEvent: vscode.ConfigurationChangeEvent) =>
@@ -105,9 +109,7 @@ export function prodEnvironment(): Current {
         return fallbackGlobalSwiftFormatPath();
       },
       toolchainPath: () => {
-        const toolchainPath:
-          | string
-          | undefined = vscode.workspace
+        const toolchainPath: string | undefined = vscode.workspace
           .getConfiguration()
           .get("swiftlint.toolchainPath");
         if (toolchainPath) {
