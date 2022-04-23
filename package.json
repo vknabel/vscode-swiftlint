@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/vknabel/vscode-swiftlint"
   },
-  "version": "1.5.0",
+  "version": "1.6.0",
   "license": "MIT",
   "author": {
     "name": "Valentin Knabel",
@@ -53,6 +53,11 @@
           "type": "boolean",
           "default": false,
           "description": "Only allows the extension to load up when SwiftLint is available via SwiftPM."
+        },
+        "swiftlint.onlyEnableWithConfig": {
+          "type": "boolean",
+          "default": false,
+          "description": "Only use SwiftLint when a config exists."
         },
         "swiftlint.path": {
           "type": "string",

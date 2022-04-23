@@ -40,6 +40,9 @@ export async function diagnosticsForDocument(request: {
   const config = await SwiftLintConfig.search(
     workspaceRoot(request.workspaceFolder)
   );
+  if (config == null && Current.config.onlyEnableWithConfig()) {
+    return;
+  }
   const configArgs = config?.arguments() || [];
 
   if (config && !(await config.includes(request.document.uri.fsPath))) {
@@ -62,6 +65,9 @@ export async function diagnosticsForDocument(request: {
       input,
     },
   });
+  if (lintingResults == null) {
+    return [];
+  }
   try {
     const reports: Report[] = JSON.parse(lintingResults) || [];
     const diagnostics = reports.map(
@@ -78,14 +84,17 @@ export async function fixDocument(request: {
   document: TextDocument;
   parameters: string[];
   workspaceFolder: WorkspaceFolder | null;
-}) {
+}): Promise<void> {
   const config = await SwiftLintConfig.search(
     workspaceRoot(request.workspaceFolder)
   );
+  if (config == null && Current.config.onlyEnableWithConfig()) {
+    return;
+  }
   const configArgs = config?.arguments() || [];
 
   if (config && !(await config.includes(request.document.uri.fsPath))) {
-    return [];
+    return;
   }
 
   const workspaceOrRoot =
@@ -110,6 +119,9 @@ export async function fixForFolder(request: {
   parameters?: string[];
 }): Promise<void> {
   const config = await SwiftLintConfig.search(workspaceRoot(request.folder));
+  if (config == null && Current.config.onlyEnableWithConfig()) {
+    return;
+  }
   const configArgs = config?.arguments() || [];
   const allFiles = await detectDefaultPathArguments(request.folder);
 
@@ -136,6 +148,9 @@ export async function diagnosticsForFolder(request: {
   parameters?: string[];
 }): Promise<Map<string, Diagnostic[]>> {
   const config = await SwiftLintConfig.search(workspaceRoot(request.folder));
+  if (config == null && Current.config.onlyEnableWithConfig()) {
+    return new Map();
+  }
   const configArgs = config?.arguments() || [];
   const allFiles = await detectDefaultPathArguments(request.folder);
 
@@ -155,6 +170,9 @@ export async function diagnosticsForFolder(request: {
       env: process.env,
     },
   });
+  if (lintingResults == null) {
+    return new Map();
+  }
   const reports: Report[] = JSON.parse(lintingResults) || [];
   const diagnostics = reports.map(reportToSimpleDiagnostic());
   const diagnosticsByFile = new Map<string, Diagnostic[]>();
@@ -259,7 +277,7 @@ function execSwiftlint(request: {
   files: string[];
   cwd: string;
   options: ExecFileOptionsWithStringEncoding & { input?: string };
-}): Promise<string> {
+}): Promise<string | null> {
   const filesEnv: NodeJS.ProcessEnv =
     request.files.length === 0
       ? {}
@@ -281,6 +299,9 @@ function execSwiftlint(request: {
 
   return new Promise((resolve, reject) => {
     const swiftLintPath = Current.config.swiftLintPath(request.uri);
+    if (swiftLintPath == null) {
+      return null;
+    }
     const swiftLintArgs = [
       ...filesModeParameters,
       "--quiet",

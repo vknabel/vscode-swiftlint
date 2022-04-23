@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0
+
+- Added: `swiftlint.onlyEnableWithConfig` to only enable SwiftLint with a config [vknabel/vscode-swiftformat#20](https://github.com/vknabel/vscode-swiftformat/issues/20)
+- Fixed: `swiftlint.onlyEnableOnSwiftPMProjects` didn't work correctly
+
 ## 1.5.0
 
 - New commands to fix autocorrect workspace and file issues `swiftlint.fixWorkspace` and `swiftlint.fixDocument` #40

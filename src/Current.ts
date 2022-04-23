@@ -23,9 +23,11 @@ export interface Current {
   };
   config: {
     isEnabled(): boolean;
+    onlyEnableOnSwiftPMProjects(): boolean;
+    onlyEnableWithConfig(): boolean;
     affectsConfiguration(changeEvent: vscode.ConfigurationChangeEvent): boolean;
 
-    swiftLintPath(uri: vscode.Uri): string;
+    swiftLintPath(uri: vscode.Uri): string | null;
     toolchainPath(): string | undefined;
     resetSwiftLintPath(): void;
     openSettings(): void;
@@ -83,6 +85,15 @@ export function prodEnvironment(): Current {
         changeEvent.affectsConfiguration("swiftlint"),
       isEnabled: () =>
         vscode.workspace.getConfiguration().get("swiftlint.enable", true),
+      onlyEnableOnSwiftPMProjects: () =>
+        vscode.workspace
+          .getConfiguration()
+          .get("swiftlint.onlyEnableOnSwiftPMProjects", false),
+      onlyEnableWithConfig: () =>
+        vscode.workspace
+          .getConfiguration()
+          .get("swiftlint.onlyEnableWithConfig", false),
+
       autoLintWorkspace: () =>
         vscode.workspace
           .getConfiguration()
@@ -104,6 +115,14 @@ export function prodEnvironment(): Current {
           if (existsSync(fullPath)) {
             return absolutePath(fullPath);
           }
+        }
+
+        if (
+          vscode.workspace
+            .getConfiguration()
+            .get("swiftlint.onlyEnableOnSwiftPMProjects", false)
+        ) {
+          return null;
         }
         // Fall back to global defaults found in settings
         return fallbackGlobalSwiftFormatPath();

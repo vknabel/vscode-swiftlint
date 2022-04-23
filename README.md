@@ -41,13 +41,15 @@ let package = Package(
 
 ## Configuration
 
-| Config                        | Type       | Default                                      | Description                                                                                                                             |
-| ----------------------------- | ---------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `swiftlint.enable`            | `Bool`     | `true`                                       | Whether SwiftLint should actually do something.                                                                                         |
-| `swiftlint.path`              | `String`   | `/usr/local/bin/swiftlint`                   | The location of the globally installed SwiftLint.                                                                                       |
-| `swiftlint.configSearchPaths` | `[String]` | `[]`                                         | Possible paths for SwiftLint config. _This disables [nested configurations](https://github.com/realm/SwiftLint#nested-configurations)!_ |
-| `swiftlint.forceExcludePaths` | `[String]` | `["tmp","build",".build","Pods","Carthage"]` | Paths to be excluded from being passed to SwiftLint.                                                                                    |
-| `swiftlint.autoLintWorkspace` | `Bool`     | `true`                                       | Automatically lint the whole project right after start.                                                                                 |
+| Config                                  | Type       | Default                                      | Description                                                                                                                             |
+| --------------------------------------- | ---------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `swiftlint.enable`                      | `Bool`     | `true`                                       | Whether SwiftLint should actually do something.                                                                                         |
+| `swiftlint.onlyEnableOnSwiftPMProjects` | `Bool`     | `false`                                      | Requires and uses a SwiftLint as SwiftPM dependency.                                                                                    |
+| `swiftlint.onlyEnableWithConfig`        | `Bool`     | `false`                                      | Only lint if config present.                                                                                                            |
+| `swiftlint.path`                        | `String`   | `/usr/local/bin/swiftlint`                   | The location of the globally installed SwiftLint.                                                                                       |
+| `swiftlint.configSearchPaths`           | `[String]` | `[]`                                         | Possible paths for SwiftLint config. _This disables [nested configurations](https://github.com/realm/SwiftLint#nested-configurations)!_ |
+| `swiftlint.forceExcludePaths`           | `[String]` | `["tmp","build",".build","Pods","Carthage"]` | Paths to be excluded from being passed to SwiftLint.                                                                                    |
+| `swiftlint.autoLintWorkspace`           | `Bool`     | `true`                                       | Automatically lint the whole project right after start.                                                                                 |
 
 ## Commands
 

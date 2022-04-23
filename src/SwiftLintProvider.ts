@@ -8,7 +8,6 @@ import {
   WorkspaceFolder,
   commands,
   Uri,
-  Command,
   CodeActionKind,
   window,
 } from "vscode";
@@ -91,7 +90,6 @@ export class SwiftLint {
           );
           this.lintDocument(updatedDoc ?? doc);
         }, 100);
-        // setTimeout(() => this.lintDocument(doc, true), 100);
       }
     };
 
