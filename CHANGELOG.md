@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0
+
+- Added: `swiftlint.additionalParameters` to enable `--format` fixes [vknabel/vscode-swiftformat#43](https://github.com/vknabel/vscode-swiftformat/issues/43)
+
 ## 1.6.0
 
 - Added: `swiftlint.onlyEnableWithConfig` to only enable SwiftLint with a config [vknabel/vscode-swiftformat#20](https://github.com/vknabel/vscode-swiftformat/issues/20)

@@ -308,6 +308,7 @@ function execSwiftlint(request: {
       "--reporter",
       "json",
       ...request.parameters,
+      ...Current.config.additionalParameters(),
     ];
     console.log(
       `cd ${request.cwd} && `,

@@ -65,6 +65,16 @@
           "description": "The location of your globally installed SwiftLint.",
           "scope": "machine"
         },
+        "swiftlint.additionalParameters": {
+          "type": "array",
+          "default": [
+            "--format"
+          ],
+          "description": "Additional parameters to pass to SwiftLint.",
+          "items": {
+            "type": "string"
+          }
+        },
         "swiftlint.toolchainPath": {
           "type": "string",
           "description": "The path of the swift toolchain. May not be the CommandLineTools."

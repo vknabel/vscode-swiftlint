@@ -29,6 +29,7 @@ export interface Current {
 
     swiftLintPath(uri: vscode.Uri): string | null;
     toolchainPath(): string | undefined;
+    additionalParameters(): string[];
     resetSwiftLintPath(): void;
     openSettings(): void;
     lintConfigSearchPaths(): string[];
@@ -143,6 +144,10 @@ export function prodEnvironment(): Current {
           ].find((tool) => fs.existsSync(tool));
         }
       },
+      additionalParameters: () =>
+        vscode.workspace
+          .getConfiguration()
+          .get("swiftlint.additionalParameters", ["--format"]),
       resetSwiftLintPath: () =>
         vscode.workspace.getConfiguration().update("swiftlint.path", undefined),
       openSettings: () =>
