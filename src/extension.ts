@@ -34,7 +34,7 @@ async function buildSwiftlintIfNeeded() {
   const buildOperations = manifests.map((manifest) => {
     const manifestPath = manifest.fsPath;
     const manifestDir = path.dirname(manifestPath);
-    return promisify(exec)("swift build --target swiftlint -c release", {
+    return promisify(exec)("swift run -c release swiftlint --version", {
       cwd: manifestDir,
     });
   });
@@ -42,7 +42,7 @@ async function buildSwiftlintIfNeeded() {
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Window,
-        title: "swift build --target swiftlint -c release",
+        title: "Preparing SwiftLint",
       },
       async () => {
         await Promise.all(buildOperations);

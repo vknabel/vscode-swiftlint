@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.1
+
+- fix: on Linux, must also be linked
+
 ## 1.7.0
 
 - Added: `swiftlint.additionalParameters` to enable `--format` fixes #43
