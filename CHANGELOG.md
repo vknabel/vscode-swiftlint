@@ -2,6 +2,10 @@
 
 ## 1.7.1
 
+- updated dependencies
+
+## 1.7.1
+
 - fix: on Linux, must also be linked
 
 ## 1.7.0
