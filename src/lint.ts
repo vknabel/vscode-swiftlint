@@ -303,6 +303,7 @@ function execSwiftlint(request: {
       return null;
     }
     const swiftLintArgs = [
+      "lint",
       ...filesModeParameters,
       "--quiet",
       "--reporter",

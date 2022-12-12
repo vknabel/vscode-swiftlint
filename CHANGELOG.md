@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.3
+
+- fix: Unrecognized arguments: --format #47 #55
+
 ## 1.7.2
 
 - updated dependencies
