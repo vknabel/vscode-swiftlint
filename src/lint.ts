@@ -208,14 +208,9 @@ async function detectDefaultPathArguments(
   workspaceFolder: WorkspaceFolder
 ): Promise<string[]> {
   const fileUris = await workspace.findFiles(
-    new RelativePattern(workspaceFolder, "**/*.swift"),
-    new RelativePattern(workspaceFolder, forceExcludePathsPattern())
+    new RelativePattern(workspaceFolder, "**/*.swift")
   );
   return fileUris.map((uri) => uri.path);
-}
-
-function forceExcludePathsPattern(): string {
-  return "**/{" + Current.config.forceExcludePaths().join(",") + "}/***";
 }
 
 function reportToPreciseDiagnosticForDocument(

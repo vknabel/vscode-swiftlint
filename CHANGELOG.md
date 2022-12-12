@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- removed: `swiftlint.forceExcludePaths` as it didn't work. Use `excluded` in your `.swiftlint` config instead. #39
+
 ## 1.7.3
 
 - fix: Unrecognized arguments: --format #47 #55

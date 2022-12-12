@@ -87,20 +87,6 @@
             "type": "string"
           }
         },
-        "swiftlint.forceExcludePaths": {
-          "type": "array",
-          "description": "Paths to be excluded from being passed to SwiftLint.",
-          "default": [
-            "tmp",
-            "build",
-            ".build",
-            "Pods",
-            "Carthage"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
         "swiftlint.autoLintWorkspace": {
           "type": "boolean",
           "description": "Automatically lint the whole project right after start.",

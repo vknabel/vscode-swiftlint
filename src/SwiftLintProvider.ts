@@ -156,14 +156,7 @@ export class SwiftLint {
         parameters: [],
         workspaceFolder,
       });
-      this.diagnosticCollection.set(
-        document.uri,
-        this.isForceExcluded(
-          path.relative(workspaceFolder?.uri.fsPath ?? "/", document.uri.fsPath)
-        )
-          ? []
-          : diagnostics
-      );
+      this.diagnosticCollection.set(document.uri, diagnostics);
       this.latestDocumentVersion.set(document.uri, document.version);
     } catch (error) {
       handleFormatError(error, document.uri);
@@ -211,7 +204,7 @@ export class SwiftLint {
           for (const file of diagnosticsByFile.keys()) {
             this.diagnosticCollection.set(
               folder.uri.with({ path: file }),
-              this.isForceExcluded(file) ? [] : diagnosticsByFile.get(file)
+              diagnosticsByFile.get(file)
             );
           }
         } catch (error) {
@@ -222,15 +215,5 @@ export class SwiftLint {
     );
 
     await Promise.all(lintWorkspaces);
-  }
-
-  private isForceExcluded(relativePath: string): boolean {
-    for (const exclude of Current.config.forceExcludePaths()) {
-      const excluded = match([relativePath], exclude, { matchBase: true });
-      if (excluded.length > 0) {
-        return true;
-      }
-    }
-    return false;
   }
 }
