@@ -4,6 +4,7 @@
 
 - fix: Unrecognized arguments: --format #47 #55
 - fix: No lintable files found at paths: '' #54
+- fix: Unexpected end of JSON input #53
 
 ## 1.7.2
 

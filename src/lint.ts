@@ -181,7 +181,12 @@ export async function diagnosticsForFolder(request: {
   if (lintingResults == null) {
     return new Map();
   }
-  const reports: Report[] = JSON.parse(lintingResults) || [];
+  let reports: Report[] = [];
+  try {
+    reports = JSON.parse(lintingResults) || [];
+  } catch (error) {
+    console.log("[Parsing linting results]", error);
+  }
   const diagnostics = reports.map(reportToSimpleDiagnostic());
   const diagnosticsByFile = new Map<string, Diagnostic[]>();
   for (const { file, diagnostic } of diagnostics) {
