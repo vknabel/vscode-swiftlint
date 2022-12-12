@@ -3,6 +3,7 @@
 ## 1.7.3
 
 - fix: Unrecognized arguments: --format #47 #55
+- fix: No lintable files found at paths: '' #54
 
 ## 1.7.2
 

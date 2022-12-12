@@ -49,6 +49,10 @@ export async function diagnosticsForDocument(request: {
     return [];
   }
 
+  if (request.document.isUntitled) {
+    return [];
+  }
+
   const workspaceOrRoot =
     request.workspaceFolder?.uri.fsPath ?? path.normalize("/");
   const relativeDocumentPath = path.relative(
@@ -94,6 +98,10 @@ export async function fixDocument(request: {
   const configArgs = config?.arguments() || [];
 
   if (config && !(await config.includes(request.document.uri.fsPath))) {
+    return;
+  }
+
+  if (request.document.isUntitled) {
     return;
   }
 
