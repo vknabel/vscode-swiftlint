@@ -27,7 +27,7 @@ export interface Current {
     onlyEnableWithConfig(): boolean;
     affectsConfiguration(changeEvent: vscode.ConfigurationChangeEvent): boolean;
 
-    swiftLintPath(uri: vscode.Uri): string | null;
+    swiftLintPath(uri: vscode.Uri): string[] | null;
     toolchainPath(): string | undefined;
     additionalParameters(): string[];
     resetSwiftLintPath(): void;
@@ -113,7 +113,7 @@ export function prodEnvironment(): Current {
           const fullPath = workspace ? join(workspace!.uri.path, path) : path;
 
           if (existsSync(fullPath)) {
-            return absolutePath(fullPath);
+            return [absolutePath(fullPath)];
           }
         }
 
@@ -160,12 +160,19 @@ export function prodEnvironment(): Current {
   };
 }
 
-const fallbackGlobalSwiftFormatPath = () =>
-  absolutePath(
-    vscode.workspace
-      .getConfiguration()
-      .get("swiftlint.path", "/usr/local/bin/swiftlint")
-  );
+const fallbackGlobalSwiftFormatPath = (): string[] => {
+  const defaultPath = ["/usr/bin/env", "swiftlint"];
+  const path = vscode.workspace
+    .getConfiguration()
+    .get("swiftlint.path", defaultPath);
+  if (typeof path === "string") {
+    return [absolutePath(path)];
+  } else if (Array.isArray(path) && path.length > 0) {
+    return [absolutePath(path[0]), ...path.slice(1)];
+  } else {
+    return defaultPath;
+  }
+};
 
 const Current = prodEnvironment();
 export default Current as Current;

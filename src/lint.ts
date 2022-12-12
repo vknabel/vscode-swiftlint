@@ -324,12 +324,12 @@ function execSwiftlint(request: {
       Object.keys(filesEnv)
         .map((env) => `${env}='${filesEnv[env]}'`)
         .join(" "),
-      `'${swiftLintPath}' `,
+      `'${swiftLintPath.join(" ")}' `,
       swiftLintArgs?.map((arg) => `'${arg}'`).join(" ")
     );
     const exec = execShell(
-      swiftLintPath,
-      swiftLintArgs,
+      swiftLintPath[0],
+      [...swiftLintPath.slice(1), ...swiftLintArgs],
       {
         encoding: "utf8",
         maxBuffer: 20 * 1024 * 1024,

@@ -38,7 +38,9 @@ export async function handleFormatError(error: any, uri: vscode.Uri) {
     }
   } else if (error.code === "ENOENT") {
     const selection = await Current.editor.showErrorMessage(
-      `Could not find SwiftLint: ${Current.config.swiftLintPath(uri)}`,
+      `Could not find SwiftLint: ${
+        Current.config.swiftLintPath(uri)?.join(" ") ?? "null"
+      }`,
       FormatErrorInteraction.reset,
       FormatErrorInteraction.configure
     );

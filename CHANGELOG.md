@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.8.0
 
 - removed: `swiftlint.forceExcludePaths` as it didn't work. Use `excluded` in your `.swiftlint` config instead. #39
+- Added: `swiftlint.path` can now be an array of strings and defaults to `[/usr/bin/env, swiftlint]` [vknabel/vscode-apple-swift-format#17](https://github.com/vknabel/vscode-apple-swift-format/issues/17)
 
 ## 1.7.3
 

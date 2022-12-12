@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/vknabel/vscode-swiftlint"
   },
-  "version": "1.7.3",
+  "version": "1.8.0",
   "license": "MIT",
   "author": {
     "name": "Valentin Knabel",
@@ -60,10 +60,29 @@
           "description": "Only use SwiftLint when a config exists."
         },
         "swiftlint.path": {
-          "type": "string",
-          "default": "/usr/local/bin/swiftlint",
           "description": "The location of your globally installed SwiftLint.",
-          "scope": "machine"
+          "scope": "machine",
+          "default": [
+            "/usr/bin/env",
+            "swiftlint"
+          ],
+          "oneOf": [
+            {
+              "type": "string",
+              "default": "/usr/local/bin/swiftlint"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "default": [
+                "/usr/bin/env",
+                "swiftlint"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
         },
         "swiftlint.additionalParameters": {
           "type": "array",
