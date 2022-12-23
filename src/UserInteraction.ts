@@ -4,6 +4,7 @@ import Current from "./Current";
 enum FormatErrorInteraction {
   configure = "Configure",
   reset = "Reset",
+  howTo = "How?",
 }
 
 enum PipeErrorInteraction {
@@ -20,7 +21,10 @@ enum UnknownErrorInteraction {
 }
 
 export async function handleFormatError(error: any, uri: vscode.Uri) {
-  if (error.code === "EPIPE") {
+  function matches(...codeOrStatus: Array<number | string>) {
+    return codeOrStatus.some((c) => c === error.code || c === error.status);
+  }
+  if (matches("EPIPE")) {
     const selection = await Current.editor.showErrorMessage(
       `Could not start SwiftLint. Probably the toolchain is wrong.`,
       PipeErrorInteraction.seeReport,
@@ -36,13 +40,14 @@ export async function handleFormatError(error: any, uri: vscode.Uri) {
         Current.config.openSettings();
         break;
     }
-  } else if (error.code === "ENOENT") {
+  } else if (matches("ENOENT", 127)) {
     const selection = await Current.editor.showErrorMessage(
       `Could not find SwiftLint: ${
         Current.config.swiftLintPath(uri)?.join(" ") ?? "null"
-      }`,
+      }.\nEnsure it is installed and in your PATH.`,
       FormatErrorInteraction.reset,
-      FormatErrorInteraction.configure
+      FormatErrorInteraction.configure,
+      FormatErrorInteraction.howTo
     );
     switch (selection) {
       case FormatErrorInteraction.reset:
@@ -51,8 +56,13 @@ export async function handleFormatError(error: any, uri: vscode.Uri) {
       case FormatErrorInteraction.configure:
         Current.config.openSettings();
         break;
+      case FormatErrorInteraction.howTo:
+        await Current.editor.openURL(
+          "https://github.com/realm/SwiftLint#installation"
+        );
+        break;
     }
-  } else if (error.code === "EBADF") {
+  } else if (matches("EBADF")) {
     const selection = await Current.editor.showErrorMessage(
       `SwiftLint failed. EBADF #28. Do you have additional information?`,
       UnfixedErrorInteraction.seeReport
@@ -64,7 +74,7 @@ export async function handleFormatError(error: any, uri: vscode.Uri) {
         );
         break;
     }
-  } else if (error.status === 70) {
+  } else if (matches(70)) {
     await Current.editor.showErrorMessage(
       `SwiftLint failed. ${error.stderr || ""}`
     );

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.1
+
+- fix: improved error message when SwiftLint is not installed #56 #57
+
 ## 1.8.0
 
 - removed: `swiftlint.forceExcludePaths` as it didn't work. Use `excluded` in your `.swiftlint` config instead. #39
