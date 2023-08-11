@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.4-beta.0
+
+- fix: default swiftlint.path value is invalid on Windows #67
+
 ## 1.8.1
 
 - fix: improved error message when SwiftLint is not installed #56 #57

@@ -161,10 +161,13 @@ export function prodEnvironment(): Current {
 }
 
 const fallbackGlobalSwiftFormatPath = (): string[] => {
-  const defaultPath = ["/usr/bin/env", "swiftlint"];
+  let defaultPath = ["/usr/bin/env", "swiftlint"];
+  if (os.platform() === "win32") {
+    defaultPath = ["swiftlint"];
+  }
   const path = vscode.workspace
     .getConfiguration()
-    .get("swiftlint.path", defaultPath);
+    .get<string | string[] | null>("swiftlint.path", null);
   if (typeof path === "string") {
     return [absolutePath(path)];
   } else if (Array.isArray(path) && path.length > 0) {
