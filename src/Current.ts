@@ -146,7 +146,7 @@ export function prodEnvironment(): Current {
       additionalParameters: () =>
         vscode.workspace
           .getConfiguration()
-          .get("swiftlint.additionalParameters", ["--format"]),
+          .get("swiftlint.additionalParameters", []),
       resetSwiftLintPath: () =>
         vscode.workspace.getConfiguration().update("swiftlint.path", undefined),
       openSettings: () =>

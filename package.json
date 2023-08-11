@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/vknabel/vscode-swiftlint"
   },
-  "version": "1.8.1",
+  "version": "1.8.3",
   "license": "MIT",
   "author": {
     "name": "Valentin Knabel",
@@ -86,9 +86,7 @@
         },
         "swiftlint.additionalParameters": {
           "type": "array",
-          "default": [
-            "--format"
-          ],
+          "default": [],
           "description": "Additional parameters to pass to SwiftLint.",
           "items": {
             "type": "string"
