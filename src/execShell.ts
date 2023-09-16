@@ -3,7 +3,9 @@ import {
   ExecException,
   execFile,
   ExecFileOptionsWithBufferEncoding,
+  spawn,
 } from "child_process";
+import * as os from "os";
 
 const currentlyRunningChildProcesses = new Set<ChildProcess>();
 
@@ -17,15 +19,37 @@ export function execShell(
     stderr: Buffer
   ) => void
 ): ChildProcess {
-  const process = execFile(
-    file,
-    args,
-    options,
-    (error: any | ExecException | null, stdout: string | any, stderr) => {
+  let process: ChildProcess;
+  function processHandler(
+    error: any | ExecException | null,
+    stdout: string | any,
+    stderr: Buffer
+  ) {
+    currentlyRunningChildProcesses.delete(process);
+    callback(error, stdout, stderr);
+  }
+
+  if (os.platform() === "win32") {
+    const spawnProcess = spawn(file, args ?? [], { ...options, shell: true });
+    process = spawnProcess;
+    spawnProcess.on("error", (error) => {
       currentlyRunningChildProcesses.delete(process);
-      callback(error, stdout, stderr);
-    }
-  );
+      processHandler(
+        error,
+        spawnProcess.stdout,
+        Buffer.from(spawnProcess.stderr)
+      );
+    });
+    spawnProcess.on("close", () => {
+      processHandler(
+        null,
+        spawnProcess.stdout,
+        Buffer.from(spawnProcess.stderr)
+      );
+    });
+  } else {
+    process = execFile(file, args, options, processHandler);
+  }
   currentlyRunningChildProcesses.add(process);
   return process;
 }
