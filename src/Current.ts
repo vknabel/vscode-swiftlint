@@ -42,6 +42,7 @@ import { url } from "./UrlLiteral";
 import { absolutePath } from "./AbsolutePath";
 import { existsSync } from "fs";
 import { join } from "path";
+import { glob } from "glob";
 
 export function prodEnvironment(): Current {
   return {
@@ -100,10 +101,9 @@ export function prodEnvironment(): Current {
           .get("swiftlint.autoLintWorkspace", true),
       swiftLintPath: (uri: vscode.Uri) => {
         // Support running from Swift PM projects
-        const possibleLocalPaths = [
-          ".build/release/swiftlint",
-          ".build/debug/swiftlint",
-        ];
+        const possibleLocalPaths = glob.sync(
+          "**/.build/{release,debug}/swiftlint"
+        );
         for (const path of possibleLocalPaths) {
           // Grab the project root from the local workspace
           const workspace = vscode.workspace.getWorkspaceFolder(uri);
