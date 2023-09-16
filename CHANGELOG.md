@@ -1,7 +1,8 @@
 # Changelog
 
-## 1.8.4-beta.0
+## next 1.8.4
 
+- fix: line must be non-negative #61
 - fix: default swiftlint.path value is invalid on Windows #67
 
 ## 1.8.1

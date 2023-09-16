@@ -248,7 +248,10 @@ function reportToSimpleDiagnostic(): (report: Report) => {
   diagnostic: Diagnostic;
 } {
   return (report) => {
-    const startPosition = new Position(report.line - 1, report.character || 0);
+    const startPosition = new Position(
+      Math.max(report.line - 1, 0),
+      Math.max(report.character || 0, 0)
+    );
     const endPosition = startPosition.translate({ characterDelta: 1 });
     const range = new Range(startPosition, endPosition);
     const severity = reportSeverityToDiagnosticSeverity(report.severity);
