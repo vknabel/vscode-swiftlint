@@ -5,6 +5,7 @@
 - fix: line must be non-negative #61
 - fix: default swiftlint.path value is invalid on Windows #67
 - fix: respect nested swift projects, see vknabel/vscode-swiftformat#26
+- fix: no lintable files found #68
 
 ## 1.8.1
 

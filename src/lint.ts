@@ -59,6 +59,9 @@ export async function diagnosticsForDocument(request: {
     workspaceOrRoot,
     request.document.uri.fsPath
   );
+  if (relativeDocumentPath === "") {
+    return [];
+  }
   const lintingResults = await execSwiftlint({
     uri: request.document.uri,
     files: [relativeDocumentPath],
@@ -111,6 +114,9 @@ export async function fixDocument(request: {
     workspaceOrRoot,
     request.document.uri.fsPath
   );
+  if (relativeDocumentPath === "") {
+    return;
+  }
   await execSwiftlint({
     uri: request.document.uri,
     files: [relativeDocumentPath],
@@ -139,6 +145,9 @@ export async function fixForFolder(request: {
       : await filterAsync(allFiles, (path) => config.includes(path))
     : request.parameters || [];
 
+  if (includedFiles.length === 0) {
+    return;
+  }
   await execSwiftlint({
     uri: request.folder.uri,
     parameters: [...configArgs, "--fix", ...(request.parameters || [])],
@@ -167,6 +176,9 @@ export async function diagnosticsForFolder(request: {
       ? []
       : await filterAsync(allFiles, (path) => config.includes(path))
     : request.parameters || [];
+  if (includedFiles.length === 0) {
+    return new Map();
+  }
 
   const lintingResults = await execSwiftlint({
     uri: request.folder.uri,
