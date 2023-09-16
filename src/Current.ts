@@ -102,7 +102,8 @@ export function prodEnvironment(): Current {
       swiftLintPath: (uri: vscode.Uri) => {
         // Support running from Swift PM projects
         const possibleLocalPaths = glob.sync(
-          "**/.build/{release,debug}/swiftlint"
+          "**/.build/{release,debug}/swiftlint",
+          { maxDepth: 5 }
         );
         for (const path of possibleLocalPaths) {
           // Grab the project root from the local workspace
