@@ -20,7 +20,6 @@ import {
 } from "./lint";
 import { handleFormatError } from "./UserInteraction";
 import * as path from "path";
-import { match } from "minimatch";
 
 export class SwiftLint {
   private latestDocumentVersion = new Map<Uri, number>();
@@ -178,7 +177,6 @@ export class SwiftLint {
         try {
           await fixForFolder({ folder });
         } catch (error) {
-          console.log(error);
           handleFormatError(error, folder.uri);
         }
       }
@@ -208,7 +206,6 @@ export class SwiftLint {
             );
           }
         } catch (error) {
-          console.log(error);
           handleFormatError(error, folder.uri);
         }
       }
