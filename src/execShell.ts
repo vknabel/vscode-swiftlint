@@ -39,7 +39,6 @@ export function execShell(
     process.stderr?.on('data', (data) => { stderrBuffers.push(data); });
 
     process.on("error", async (error) => {
-      currentlyRunningChildProcesses.delete(process);
       processHandler(
         error,
         Buffer.concat(stdoutBuffers).toString(),
