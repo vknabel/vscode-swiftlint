@@ -126,7 +126,7 @@ export function prodEnvironment(): Current {
           return null;
         }
         // Fall back to global defaults found in settings
-        return fallbackGlobalSwiftFormatPath();
+        return fallbackGlobalSwiftLintPath();
       },
       toolchainPath: () => {
         const toolchainPath: string | undefined = vscode.workspace
@@ -161,21 +161,24 @@ export function prodEnvironment(): Current {
   };
 }
 
-const fallbackGlobalSwiftFormatPath = (): string[] => {
-  let defaultPath = ["/usr/bin/env", "swiftlint"];
-  if (os.platform() === "win32") {
-    defaultPath = ["swiftlint"];
-  }
-  const path = vscode.workspace
+const fallbackGlobalSwiftLintPath = (): string[] => {
+  var path = vscode.workspace
     .getConfiguration()
     .get<string | string[] | null>("swiftlint.path", null);
+
   if (typeof path === "string") {
-    return [absolutePath(path)];
-  } else if (Array.isArray(path) && path.length > 0) {
-    return [absolutePath(path[0]), ...path.slice(1)];
-  } else {
-    return defaultPath;
+    path = [path];
   }
+  if (!Array.isArray(path) || path.length === 0) {
+    path = [os.platform() === "win32" ? "swiftlint.exe" : "swiftlint"];
+  }
+
+  if (os.platform() !== "win32" && !path[0].includes("/")) {
+    // Only a binary name, not a path. Search for it in the path (on Windows this is implicit).
+    path = ["/usr/bin/env", ...path];
+  }
+
+  return path;
 };
 
 const Current = prodEnvironment();
