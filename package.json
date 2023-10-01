@@ -61,20 +61,16 @@
         "swiftlint.path": {
           "description": "The location of your globally installed SwiftLint.",
           "scope": "machine",
-          "default": [
-            "/usr/bin/env",
-            "swiftlint"
-          ],
+          "default": "swiftlint",
           "oneOf": [
             {
               "type": "string",
-              "default": "/usr/local/bin/swiftlint"
+              "default": "swiftlint"
             },
             {
               "type": "array",
               "minItems": 1,
               "default": [
-                "/usr/bin/env",
                 "swiftlint"
               ],
               "items": {
