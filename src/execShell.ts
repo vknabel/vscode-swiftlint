@@ -31,22 +31,25 @@ export function execShell(
   }
 
   if (os.platform() === "win32") {
-    const spawnProcess = spawn(file, args ?? [], { ...options, shell: true });
-    process = spawnProcess;
+    process = spawn(file, args ?? [], { ...options, shell: true });
+    var stdoutBuffers: Buffer[] = [];
+    process.stdout?.on('data', (data) => { stdoutBuffers.push(data); });
 
-    spawnProcess.on("error", async (error) => {
-      currentlyRunningChildProcesses.delete(process);
+    var stderrBuffers: Buffer[] = [];
+    process.stderr?.on('data', (data) => { stderrBuffers.push(data); });
+
+    process.on("error", async (error) => {
       processHandler(
         error,
-        spawnProcess.stdout,
-        await bufferFromReadableStream(spawnProcess.stderr)
+        Buffer.concat(stdoutBuffers).toString(),
+        Buffer.concat(stderrBuffers)
       );
     });
-    spawnProcess.on("close", async () => {
+    process.on("close", () => {
       processHandler(
         null,
-        spawnProcess.stdout,
-        await bufferFromReadableStream(spawnProcess.stderr)
+        Buffer.concat(stdoutBuffers).toString(),
+        Buffer.concat(stderrBuffers)
       );
     });
   } else {
