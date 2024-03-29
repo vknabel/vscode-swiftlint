@@ -53,6 +53,10 @@ export async function diagnosticsForDocument(request: {
     return [];
   }
 
+  if (!request.document.uri.fsPath) {
+    return [];
+  }
+
   const workspaceOrRoot =
     request.workspaceFolder?.uri.fsPath ?? path.normalize("/");
   const relativeDocumentPath = path.relative(
