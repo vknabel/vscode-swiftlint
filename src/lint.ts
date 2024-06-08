@@ -53,8 +53,7 @@ export async function diagnosticsForDocument(request: {
     return [];
   }
 
-  // Skip linting if the user navigates to a system framework interface file.
-  if (request.document.uri.fsPath.includes(".swiftinterface")) {
+  if (!request.document.uri.fsPath || request.document.uri.fsPath.includes(".swiftinterface")) {
     return [];
   }
 
