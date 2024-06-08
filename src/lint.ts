@@ -53,7 +53,7 @@ export async function diagnosticsForDocument(request: {
     return [];
   }
 
-  if (!request.document.uri.fsPath) {
+  if (!request.document.uri.fsPath || request.document.uri.fsPath.includes(".swiftinterface")) {
     return [];
   }
 
