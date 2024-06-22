@@ -53,7 +53,10 @@ export async function diagnosticsForDocument(request: {
     return [];
   }
 
-  if (!request.document.uri.fsPath || request.document.uri.fsPath.includes(".swiftinterface")) {
+  if (
+    !request.document.uri.fsPath ||
+    request.document.uri.fsPath.includes(".swiftinterface")
+  ) {
     return [];
   }
 
@@ -180,7 +183,7 @@ export async function diagnosticsForFolder(request: {
       ? []
       : await filterAsync(allFiles, (path) => config.includes(path))
     : request.parameters || [];
-  if (includedFiles.length === 0) {
+  if (includedFiles.length === 0 && config != null) {
     return new Map();
   }
 
