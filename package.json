@@ -56,7 +56,7 @@
         "swiftlint.onlyEnableWithConfig": {
           "type": "boolean",
           "default": false,
-          "description": "Only use SwiftLint when a config exists."
+          "description": "Only use SwiftLint when a config exists. Requires `swiftlint.configSearchPaths`."
         },
         "swiftlint.path": {
           "description": "The location of your globally installed SwiftLint.",
