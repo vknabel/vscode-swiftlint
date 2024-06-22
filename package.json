@@ -120,6 +120,11 @@
         "title": "SwiftLint: Fix all autocorrect issues in document",
         "command": "swiftlint.fixDocument",
         "shortTitle": "SwiftLint: Fix document"
+      },
+      {
+        "title": "SwiftLint: Fix all known autocorrect issues",
+        "command": "source.fixAll.swiftlint",
+        "shortTitle": "SwiftLint: Fix all known issues"
       }
     ]
   },

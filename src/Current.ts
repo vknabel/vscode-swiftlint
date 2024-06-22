@@ -20,6 +20,7 @@ export interface Current {
     lintWorkspace: string;
     fixWorkspace: string;
     fixDocument: string;
+    fixAll: string;
   };
   config: {
     isEnabled(): boolean;
@@ -80,6 +81,7 @@ export function prodEnvironment(): Current {
       lintWorkspace: "swiftlint.lintWorkspace",
       fixWorkspace: "swiftlint.fixWorkspace",
       fixDocument: "swiftlint.fixDocument",
+      fixAll: "source.fixAll.swiftlint",
     },
     config: {
       affectsConfiguration: (changeEvent: vscode.ConfigurationChangeEvent) =>

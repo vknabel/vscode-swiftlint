@@ -65,32 +65,11 @@ export class SwiftLint {
       this.fixWorkspace().then(() => this.lintWorkspace());
     });
     commands.registerCommand(Current.commands.fixDocument, (...args) =>
-      setTimeout(() => performfixDocument(...args), 1)
+      setTimeout(() => this.performFixDocument(...args), 1)
     );
-    const performfixDocument = async (...args: any[]) => {
-      let docs: TextDocument[];
-      if (args.length === 0 && window.activeTextEditor) {
-        docs = [window.activeTextEditor.document];
-      } else {
-        docs = [];
-        for (let arg of args) {
-          const textDocument = await workspace.openTextDocument(arg);
-          docs.push(textDocument);
-        }
-      }
-      for (const doc of docs) {
-        if (doc.isDirty) {
-          await doc.save();
-        }
-        await this.fixDocument(doc);
-        setTimeout(() => {
-          const updatedDoc = workspace.textDocuments.find(
-            (textDoc) => textDoc.uri === doc.uri
-          );
-          this.lintDocument(updatedDoc ?? doc);
-        }, 100);
-      }
-    };
+    commands.registerCommand(Current.commands.fixAll, () =>
+      setTimeout(() => this.fixAllKnownDiagnostics(), 1)
+    );
 
     workspace.onDidChangeConfiguration((configChange) => {
       if (Current.config.affectsConfiguration(configChange)) {
@@ -123,6 +102,32 @@ export class SwiftLint {
     if (Current.config.autoLintWorkspace()) {
       this.lintWorkspace();
     }
+  }
+
+  private async performFixDocument(...args: any[]) {
+    let docs: TextDocument[];
+    if (args.length === 0 && window.activeTextEditor) {
+      docs = [window.activeTextEditor.document];
+    } else {
+      docs = [];
+      for (let arg of args) {
+        const textDocument = await workspace.openTextDocument(arg);
+        docs.push(textDocument);
+      }
+    }
+    const updates = docs.map(async (doc) => {
+      if (doc.isDirty) {
+        await doc.save();
+      }
+      await this.fixDocument(doc);
+      setTimeout(() => {
+        const updatedDoc = workspace.textDocuments.find(
+          (textDoc) => textDoc.uri === doc.uri
+        );
+        this.lintDocument(updatedDoc ?? doc);
+      }, 100);
+    });
+    return Promise.all(updates);
   }
 
   public async fixDocument(document: TextDocument) {
@@ -212,5 +217,16 @@ export class SwiftLint {
     );
 
     await Promise.all(lintWorkspaces);
+  }
+
+  public async fixAllKnownDiagnostics() {
+    const docs = new Set<Uri>();
+    this.diagnosticCollection.forEach((uri) => {
+      if (docs.has(uri)) {
+        return;
+      }
+      docs.add(uri);
+    });
+    return this.performFixDocument(...docs.values());
   }
 }
