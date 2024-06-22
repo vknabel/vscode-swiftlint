@@ -41,8 +41,8 @@ import * as vscode from "vscode";
 import { url } from "./UrlLiteral";
 import { absolutePath } from "./AbsolutePath";
 import { existsSync } from "fs";
-import { join } from "path";
-import { glob } from "glob";
+import * as paths from "path";
+import * as glob from "glob";
 
 export function prodEnvironment(): Current {
   return {
@@ -100,31 +100,27 @@ export function prodEnvironment(): Current {
           .getConfiguration()
           .get("swiftlint.autoLintWorkspace", true),
       swiftLintPath: (uri: vscode.Uri) => {
+        // Grab the project root from the local workspace
+        const workspace = vscode.workspace.getWorkspaceFolder(uri);
+        if (workspace == null) {
+          return fallbackGlobalSwiftLintPath();
+        }
+
         // Support running from Swift PM projects
         const possibleLocalPaths = glob.sync(
           "**/.build/{release,debug}/swiftlint",
           { maxDepth: 5 }
         );
         for (const path of possibleLocalPaths) {
-          // Grab the project root from the local workspace
-          const workspace = vscode.workspace.getWorkspaceFolder(uri);
-          if (workspace === null) {
-            continue;
-          }
-          const fullPath = workspace ? join(workspace!.uri.path, path) : path;
+          const fullPath = workspace
+            ? paths.resolve(workspace!.uri.path, path)
+            : path;
 
           if (existsSync(fullPath)) {
             return [absolutePath(fullPath)];
           }
         }
 
-        if (
-          vscode.workspace
-            .getConfiguration()
-            .get("swiftlint.onlyEnableOnSwiftPMProjects", false)
-        ) {
-          return null;
-        }
         // Fall back to global defaults found in settings
         return fallbackGlobalSwiftLintPath();
       },
@@ -161,7 +157,15 @@ export function prodEnvironment(): Current {
   };
 }
 
-const fallbackGlobalSwiftLintPath = (): string[] => {
+const fallbackGlobalSwiftLintPath = (): string[] | null => {
+  if (
+    vscode.workspace
+      .getConfiguration()
+      .get("swiftlint.onlyEnableOnSwiftPMProjects", false)
+  ) {
+    return null;
+  }
+
   var path = vscode.workspace
     .getConfiguration()
     .get<string | string[] | null>("swiftlint.path", null);
