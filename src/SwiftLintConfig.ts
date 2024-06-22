@@ -25,8 +25,15 @@ export class SwiftLintConfig {
     const configData = await promisify(readFile)(configPath, {
       encoding: "utf8",
     });
-    const config: SwiftLintConfigData = YAML.parse(configData);
-    return new SwiftLintConfig(configPath, config);
+    try {
+      const config: SwiftLintConfigData = YAML.parse(configData);
+      return new SwiftLintConfig(configPath, config);
+    } catch (error) {
+      Current.editor.showWarningMessage(
+        `Failed to parse SwiftLint configuration at ${configPath}: ${error}`
+      );
+      return new SwiftLintConfig(configPath, null);
+    }
   }
 
   private readonly config: SwiftLintConfigData;
