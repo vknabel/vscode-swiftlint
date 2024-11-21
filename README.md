@@ -45,7 +45,7 @@ let package = Package(
 | --------------------------------------- | ---------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `swiftlint.enable`                      | `Bool`     | `true`      | Whether SwiftLint should actually do something.                                                                                         |
 | `swiftlint.onlyEnableOnSwiftPMProjects` | `Bool`     | `false`     | Requires and uses a SwiftLint as SwiftPM dependency.                                                                                    |
-| `swiftlint.onlyEnableWithConfig`        | `Bool`     | `false`     | Only lint if config present.                                                                                                            |
+| `swiftlint.onlyEnableWithConfig`        | `Bool`     | `false`     | Only lint if config present. Requires `swiftlint.configSearchPaths`.                                                                    |
 | `swiftlint.path`                        | `String`   | `swiftlint` | The location of the globally installed SwiftLint (resolved with the current path if only a filename).                                   |
 | `swiftlint.additionalParameters`        | `[String]` | `[]`        | Additional parameters to pass to SwiftLint.                                                                                             |
 | `swiftlint.configSearchPaths`           | `[String]` | `[]`        | Possible paths for SwiftLint config. _This disables [nested configurations](https://github.com/realm/SwiftLint#nested-configurations)!_ |
@@ -69,10 +69,6 @@ To automatically fix all issues within a document on save, add the following to 
   }
 }
 ```
-
-## Contributors
-
-- Valentin Knabel, [@vknabel](https://github.com/vknabel), [@vknabel](https://twitter.com/vknabel) on Twitter
 
 ## License
 
