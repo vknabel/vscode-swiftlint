@@ -53,11 +53,12 @@ let package = Package(
 
 ## Commands
 
-| Short Title               | Command                   |
-| ------------------------- | ------------------------- |
-| SwiftLint: Lint workspace | `swiftlint.lintWorkspace` |
-| SwiftLint: Fix workspace  | `swiftlint.fixWorkspace`  |
-| SwiftLint: Fix document   | `swiftlint.fixDocument`   |
+| Short Title                     | Command                   |
+| ------------------------------- | ------------------------- |
+| SwiftLint: Lint workspace       | `swiftlint.lintWorkspace` |
+| SwiftLint: Fix workspace        | `swiftlint.fixWorkspace`  |
+| SwiftLint: Fix document         | `swiftlint.fixDocument`   |
+| SwiftLint: Fix all known issues | `source.fixAll.swiftlint` |
 
 To automatically fix all issues within a document on save, add the following to your `.vscode/settings.json`:
 
