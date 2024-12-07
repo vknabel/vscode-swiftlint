@@ -69,6 +69,7 @@
         },
         "swiftlint.path": {
           "description": "The location of your globally or locally installed SwiftLint.",
+          "scope": "machine-overridable",
           "default": "swiftlint",
           "oneOf": [
             {
