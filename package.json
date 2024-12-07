@@ -59,8 +59,7 @@
           "description": "Only use SwiftLint when a config exists. Requires `swiftlint.configSearchPaths`."
         },
         "swiftlint.path": {
-          "description": "The location of your globally installed SwiftLint.",
-          "scope": "machine",
+          "description": "The location of your globally or locally installed SwiftLint.",
           "default": "swiftlint",
           "oneOf": [
             {
