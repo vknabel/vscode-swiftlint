@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/vknabel/vscode-swiftlint"
   },
-  "version": "1.8.4",
+  "version": "1.8.5",
   "license": "MIT",
   "author": {
     "name": "Valentin Knabel",
@@ -38,6 +38,15 @@
     "workspaceContains:**/*swift"
   ],
   "main": "./out/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "Since the SwiftLint path is used to execute SwiftLint, it must be trusted.",
+      "restrictedConfigurations": [
+        "swiftlint.path"
+      ]
+    }
+  },
   "contributes": {
     "configuration": {
       "title": "SwiftLint configuration",
@@ -59,8 +68,8 @@
           "description": "Only use SwiftLint when a config exists. Requires `swiftlint.configSearchPaths`."
         },
         "swiftlint.path": {
-          "description": "The location of your globally installed SwiftLint.",
-          "scope": "machine",
+          "description": "The location of your globally or locally installed SwiftLint.",
+          "scope": "machine-overridable",
           "default": "swiftlint",
           "oneOf": [
             {
