@@ -109,17 +109,19 @@ export function prodEnvironment(): Current {
         }
 
         // Support running from Swift PM projects
-        const possibleLocalPaths = glob.sync(
-          "**/.build/{release,debug}/swiftlint",
-          { maxDepth: 5 }
-        );
-        for (const path of possibleLocalPaths) {
-          const fullPath = workspace
+        if (Current.config.onlyEnableOnSwiftPMProjects()) {
+          const possibleLocalPaths = glob.sync(
+            "**/.build/{release,debug}/swiftlint",
+            { maxDepth: 5 }
+          );
+          for (const path of possibleLocalPaths) {
+            const fullPath = workspace
             ? paths.resolve(workspace!.uri.path, path)
             : path;
 
-          if (existsSync(fullPath)) {
-            return [absolutePath(fullPath)];
+            if (existsSync(fullPath)) {
+              return [absolutePath(fullPath)];
+            }
           }
         }
 
@@ -160,11 +162,7 @@ export function prodEnvironment(): Current {
 }
 
 const fallbackGlobalSwiftLintPath = (): string[] | null => {
-  if (
-    vscode.workspace
-      .getConfiguration()
-      .get("swiftlint.onlyEnableOnSwiftPMProjects", false)
-  ) {
+  if (Current.config.onlyEnableOnSwiftPMProjects()) {
     return null;
   }
 

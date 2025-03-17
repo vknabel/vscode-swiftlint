@@ -33,7 +33,7 @@ let package = Package(
         .package(url: "https://github.com/orta/PackageConfig.git", from: "0.0.1"),
         // Dev deps
         .package(url: "https://github.com/orta/Komondor.git", from: "0.0.1"),
-+        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.37.0"),
++        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.58.2"),
     ],
     targets: [...]
 )
@@ -44,12 +44,18 @@ let package = Package(
 | Config                                  | Type       | Default     | Description                                                                                                                             |
 | --------------------------------------- | ---------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `swiftlint.enable`                      | `Bool`     | `true`      | Whether SwiftLint should actually do something.                                                                                         |
-| `swiftlint.onlyEnableOnSwiftPMProjects` | `Bool`     | `false`     | Requires and uses a SwiftLint as SwiftPM dependency.                                                                                    |
+| `swiftlint.onlyEnableOnSwiftPMProjects` | `Bool`     | `false`     | Requires and uses a SwiftLint as SwiftPM dependency. This will cause the extension to build the Swift package upon first launch.        |
 | `swiftlint.onlyEnableWithConfig`        | `Bool`     | `false`     | Only lint if config present. Requires `swiftlint.configSearchPaths`.                                                                    |
 | `swiftlint.path`                        | `String`   | `swiftlint` | The location of the globally installed SwiftLint (resolved with the current path if only a filename).                                   |
 | `swiftlint.additionalParameters`        | `[String]` | `[]`        | Additional parameters to pass to SwiftLint.                                                                                             |
 | `swiftlint.configSearchPaths`           | `[String]` | `[]`        | Possible paths for SwiftLint config. _This disables [nested configurations](https://github.com/realm/SwiftLint#nested-configurations)!_ |
 | `swiftlint.autoLintWorkspace`           | `Bool`     | `true`      | Automatically lint the whole project right after start.                                                                                 |
+
+Note that when `swiftlint.onlyEnableOnSwiftPMProjects` is enabled, the extension will only run `swiftlint` executables
+built as part of the Swift package open in the workspace. It will try to build the binary once on first launch. If
+the build fails, the extension will not fall back to a globally installed `swiftlint`. If you prefer a
+locally built `swiftlint`, but want to skip the automatic initial build, let `swiftlint.path` point to the local
+executable you have built manually or by other means independent of the extension.
 
 ## Commands
 
