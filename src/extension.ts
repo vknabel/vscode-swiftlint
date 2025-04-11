@@ -23,6 +23,9 @@ export function deactivate(_context: vscode.ExtensionContext) {
 }
 
 async function buildSwiftlintIfNeeded() {
+  if (!Current.config.onlyEnableOnSwiftPMProjects()) {
+    return;
+  }
   const manifests = await vscode.workspace.findFiles(
     "**/Package.swift",
     "**/.build/**",
